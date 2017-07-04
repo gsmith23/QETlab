@@ -25,6 +25,12 @@ namespace Tangle2 {
   extern G4ThreadLocal G4int nb_Compt;
   extern G4ThreadLocal G4ThreeVector posA;
   extern G4ThreadLocal G4ThreeVector posB;
+  extern G4ThreadLocal G4double thetaA;
+  extern G4ThreadLocal G4double thetaB;
+  extern G4ThreadLocal G4double phiA;
+  extern G4ThreadLocal G4double phiB;
+  extern G4ThreadLocal G4double dphi;
+  
 }
 
 #endif

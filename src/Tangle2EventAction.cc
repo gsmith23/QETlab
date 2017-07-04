@@ -42,6 +42,13 @@ void Tangle2EventAction::BeginOfEventAction(const G4Event*)
   Tangle2::nb_Compt = 0;
   Tangle2::posA = G4ThreeVector();
   Tangle2::posB = G4ThreeVector();
+  Tangle2::thetaA = 0;
+  Tangle2::thetaB = 0;
+  Tangle2::phiA = 0;
+  Tangle2::phiB = 0;
+  Tangle2:: dphi = 0;
+
+  
 }
 
 void Tangle2EventAction::EndOfEventAction(const G4Event*)
@@ -67,12 +74,14 @@ void Tangle2EventAction::EndOfEventAction(const G4Event*)
       nb_HitsA += 1;
       eDepEvent += Tangle2::eDepCryst[i];}
    }
+  
   //Array B
   for (G4int i = 9; i< 18; i++){
    if (Tangle2::eDepCryst[i] > 0){
       nb_HitsB += 1;
       eDepEvent += Tangle2::eDepCryst[i];}
    }
+
 
   //Output only 'true lab events' to the root file
   //
@@ -89,6 +98,11 @@ void Tangle2EventAction::EndOfEventAction(const G4Event*)
       man->FillNtupleDColumn(22, Tangle2::posB[0]/mm);
       man->FillNtupleDColumn(23, Tangle2::posB[1]/mm);
       man->FillNtupleDColumn(24, Tangle2::posB[2]/mm);
+      man->FillNtupleDColumn(25, Tangle2::thetaA/radian);
+      man->FillNtupleDColumn(26, Tangle2::thetaB/radian);
+      man->FillNtupleDColumn(27, Tangle2::phiA/radian);
+      man->FillNtupleDColumn(28, Tangle2::phiB/radian);
+      man->FillNtupleDColumn(29, Tangle2::dphi/radian);
       
       man->AddNtupleRow();
   }

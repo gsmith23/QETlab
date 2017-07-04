@@ -94,6 +94,14 @@ void Tangle2RunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("BdX");
   analysisManager->CreateNtupleDColumn("BdY");
   analysisManager->CreateNtupleDColumn("BdZ");
+  //theta
+  analysisManager->CreateNtupleDColumn("ThetaA");
+  analysisManager->CreateNtupleDColumn("ThetaB");
+  //phi
+  analysisManager->CreateNtupleDColumn("PhiA");
+  analysisManager->CreateNtupleDColumn("PhiB");
+  analysisManager->CreateNtupleDColumn("dPhi");
+    
   analysisManager->FinishNtuple();
 
   analysisManager->OpenFile("Tangle2");
