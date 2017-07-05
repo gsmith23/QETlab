@@ -50,26 +50,31 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   G4ParticleDefinition* particle
     = particleTable->FindParticle(particleName="gamma");
 
+  G4ThreeVector x_axis = G4ThreeVector(1,0,0);
+
   //photon1
   fParticleGun->SetParticleDefinition(particle);
   fParticleGun->SetParticleEnergy(511*keV);
   G4double x0  = 0*cm, y0  = 0*cm, z0  = 0*cm;
   fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
-  // fParticleGun->SetParticlePolarization(G4RandomDirection());
-  //ADD polarisation
-  fParticleGun->SetParticlePolarization(G4ThreeVector(0,1,0));
-  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1,0,0));
+  fParticleGun->SetParticleMomentumDirection(x_axis);
+  //Generate a random vector direction  
+  G4ThreeVector random = G4RandomDirection();
+  fParticleGun->SetParticlePolarization(random);
+  //fParticleGun->SetParticlePolarization(G4ThreeVector(0,1,0));
   //create vertex
   fParticleGun->GeneratePrimaryVertex(anEvent);
+
+  //Define vector direction perpenicular to photon1 polarisation  
+  G4ThreeVector PerpPolarization = x_axis.cross(random);
 
   //photon 2
   fParticleGun->SetParticleDefinition(particle);
   fParticleGun->SetParticleEnergy(511*keV);
-  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(-1,0,0));
-  fParticleGun->SetParticlePosition(G4ThreeVector());
-  // fParticleGun->SetParticlePolarization(G4RandomDirection());
-  //ADD polarisation
-  fParticleGun->SetParticlePolarization(G4ThreeVector(0,0,1));
+  fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
+  fParticleGun->SetParticleMomentumDirection(-x_axis);
+  //fParticleGun->SetParticlePolarization(G4ThreeVector(0,0,1));
+  fParticleGun->SetParticlePolarization(PerpPolarization);
   //create vertex
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }
