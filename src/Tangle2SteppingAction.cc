@@ -53,16 +53,16 @@ void CalculateThetaPhi
    G4double& phi)
   {
     cosTheta = v*z_axis;
-    theta = std::acos(cosTheta) * 180/(2*pi);
+    theta = std::acos(cosTheta) * 180/(pi);
     // Make y' perpendicular to global x-axis.
-    y_axis = (z_axis.cross(G4ThreeVector(1,0,0))).unit();
+    y_axis = (z_axis.cross(G4ThreeVector(0,1,0))).unit();
     x_axis = y_axis.cross(z_axis);
     const G4ThreeVector ontoXYPlane = v.cross(z_axis);
     // ontoXYPlane is a vector in the xy-plane, but perpendicular to the
     // projection of the scattered photon, so
     const G4double projection_x = -ontoXYPlane*y_axis;
     const G4double projection_y = ontoXYPlane*x_axis;
-    phi = std::atan2(projection_y,projection_x) * 180/(2*pi);
+    phi = std::atan2(projection_y,projection_x) * 180/(pi);
   }
 
 void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
@@ -124,7 +124,7 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
   << ',' << Tangle2::thetaB
   << ',' << Tangle2::phiA
   << ',' << Tangle2::phiB
-  << ',' << Tangle2::dphi
+  << ',' << Tangle2::dphi  
   << std::endl;
 
   if (eDep > 0){
@@ -138,9 +138,11 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
       Tangle2::posA = postMomentumDir;}
     G4ThreeVector photon1_y_axis;  // dummy, i.e., not used.
     G4ThreeVector photon1_x_axis;  // dummy
-    G4double fCosTheta1; 
+    G4double fCosTheta1;
+    //G4ThreeVector beamdir = G4ThreeVector(1,0,0);
     CalculateThetaPhi(postMomentumDir,
-		      preMomentumDir,
+		      // preMomentumDir,
+		      G4ThreeVector(1,0,0),
 		      photon1_y_axis,
 		      photon1_x_axis,
 		      fCosTheta1,
@@ -158,7 +160,8 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
     G4ThreeVector photon2_x_axis;  // dummy
     G4double fCosTheta2; 
     CalculateThetaPhi(postMomentumDir,
-		      preMomentumDir,
+		      //preMomentumDir,
+		      G4ThreeVector(1,0,0),
 		      photon2_y_axis,
 		      photon2_x_axis,
 		      fCosTheta2,
@@ -168,6 +171,31 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
   }
 
   Tangle2::dphi = Tangle2::phiB - Tangle2::phiA;
+
+  /*while(true)
+    {
+      if (Tangle2::dphi > 180)
+	{
+	  Tangle2::dphi -= 360;
+	    }
+      if (Tangle2::dphi < -180)
+	{
+	  Tangle2::dphi += 360;
+	    }
+      else
+	{ break;
+	    }
+	    }*/
+
+  G4double zerophi = 0;
+  
+  if (Tangle2::dphi <0){
+    Tangle2::dphi = Tangle2::dphi + 360;}
+
+  
+  if (Tangle2::dphi < 0.01){
+    zerophi +=1;}
+ 
 
   if (processDefinedStep->GetProcessName() == "compt"){
     Tangle2::nb_Compt += 1;}

@@ -58,10 +58,12 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   G4double x0  = 0*cm, y0  = 0*cm, z0  = 0*cm;
   fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
   fParticleGun->SetParticleMomentumDirection(x_axis);
-  //Generate a random vector direction  
-  G4ThreeVector random = G4RandomDirection();
+  //Generate a random vector direction perpendicular to x_axis  
+  G4ThreeVector random1 = G4RandomDirection();
+  G4ThreeVector random = random1.cross(x_axis);
+ 
   fParticleGun->SetParticlePolarization(random);
-  //fParticleGun->SetParticlePolarization(G4ThreeVector(0,1,0));
+  // fParticleGun->SetParticlePolarization(G4ThreeVector(0,1,0));
   //create vertex
   fParticleGun->GeneratePrimaryVertex(anEvent);
 

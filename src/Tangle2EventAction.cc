@@ -103,7 +103,6 @@ void Tangle2EventAction::EndOfEventAction(const G4Event*)
       man->FillNtupleDColumn(27, Tangle2::phiA/radian);
       man->FillNtupleDColumn(28, Tangle2::phiB/radian);
       man->FillNtupleDColumn(29, Tangle2::dphi/radian);
-      
       man->AddNtupleRow();
   }
 
