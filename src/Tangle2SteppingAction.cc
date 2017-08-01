@@ -29,6 +29,7 @@
 #include "G4PhysicalConstants.hh"
 #include "G4Gamma.hh"
 #include "G4Threading.hh"
+#include <vector>
 
 Tangle2SteppingAction::Tangle2SteppingAction
 (Tangle2RunAction* runAction)
@@ -65,14 +66,19 @@ void CalculateThetaPhi
     phi = std::atan2(projection_y,projection_x) * 180/(pi);
   }
 
+
+G4int param1, param2, StepNo1, StepNo2;
+
+
 void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
 {
+  
   G4StepPoint* preStepPoint = step->GetPreStepPoint();
   G4StepPoint* postStepPoint = step->GetPostStepPoint();
 
   G4double eDep = step->GetTotalEnergyDeposit();
 
-  G4VPhysicalVolume* prePV = preStepPoint->GetPhysicalVolume();
+  // G4VPhysicalVolume* prePV = preStepPoint->GetPhysicalVolume();
   G4VPhysicalVolume* postPV = postStepPoint->GetPhysicalVolume();
 
   G4ThreeVector prePos = preStepPoint->GetPosition();
@@ -82,123 +88,144 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
   G4ThreeVector postMomentumDir = postStepPoint->GetMomentumDirection();
 
   G4Track* track = step->GetTrack();
-  G4ParticleDefinition* particleDefinition = track->GetDefinition();
-  const G4VProcess* creatorProcess = track->GetCreatorProcess();
+  G4int stepNumber = track->GetCurrentStepNumber(); 
+  // G4ParticleDefinition* particleDefinition = track->GetDefinition();
+  // const G4VProcess* creatorProcess = track->GetCreatorProcess();
 
   const G4VProcess* processDefinedStep = postStepPoint->GetProcessDefinedStep();
 
-  
+  // G4cout<<"Step number "<<stepNumber<<" for "<<processDefinedStep->GetProcessName()<<" for particle " <<track->GetTrackID()<<G4endl;
 
-  
-  // Always use a lock when writing a file in MT mode
-  G4AutoLock lock(&Tangle2::outFileMutex);
-  static G4bool first = true;
-  if (first) {
-    first = false;
-    // Write header
-    Tangle2::outFile
-    << "#,TrackID,name,prePV,copyNo,prePos_X,prePos_Y,prePos_Z,postPV,copyNo"
-      ",postPos_X,postPos_Y,postPos_Z,creatorProcess,processDefinedStep,Mom_X,Mom_Y,Mom_Z,eDep/MeV,thetaA,thetaB,phiA,phiB,dphi"
-    << std::endl;
-  }
-  Tangle2::outFile
-  << ',' << track->GetTrackID()
-  << ',' << particleDefinition->GetParticleName()
-  << ',' << (prePV? prePV->GetName(): "none")
-  << ',' << (prePV? prePV->GetCopyNo(): 0)
-  << ',' << prePos[0]
-  << ',' << prePos[1]
-  << ',' << prePos[2]
-  << ',' << (postPV? postPV->GetName(): "none")
-  << ',' << (postPV? postPV->GetCopyNo(): 0)
-  << ',' << postPos[0]
-  << ',' << postPos[1]
-  << ',' << postPos[2]
-  << ',' << (creatorProcess? creatorProcess->GetProcessName(): "none")
-  << ',' << processDefinedStep->GetProcessName()
-  << ',' << postMomentumDir[0]
-  << ',' << postMomentumDir[1]
-  << ',' << postMomentumDir[2]
-  << ',' << eDep/MeV
-  << ',' << Tangle2::thetaA
-  << ',' << Tangle2::thetaB
-  << ',' << Tangle2::phiA
-  << ',' << Tangle2::phiB
-  << ',' << Tangle2::dphi  
-  << std::endl;
-
-  if (eDep > 0){
+  //Fill energy array
+  if ((eDep > 0) && (postPV->GetName() != "disc")){
     (postPV? Tangle2::eDepCryst[postPV->GetCopyNo()] += eDep : eDep = 0);}
 
+
+  //---------------------Look at COMPTON or PHOTOELECTRIC processes-------------------
   
-  //CRYSTAL A
-  if ((prePos == Tangle2::posA) && (track->GetTrackID() == 1)){
-    Tangle2::posA = postPos - prePos;
-    if (processDefinedStep->GetProcessName() == "compt"){
-      Tangle2::posA = postMomentumDir;}
+  // return if the interaction is NOT Compton or Photoelectric
+
+  if((processDefinedStep->GetProcessName() != "compt") && (processDefinedStep->GetProcessName() != "phot"))
+    {
+    return;  
+    }
+  
+    
+   /*  Find the step number for the second Compton/photoelectric interaction
+       param1/2 is used to stop assigning value to StepNo1/2 after the second interaction
+       (Note that the first interaction is always step number 2)    */
+  
+  //Photon 1
+   if((track->GetTrackID() == 1) && (stepNumber==2)){
+     param1 =0;
+   }
+   
+   if ((track->GetTrackID() == 1) && (stepNumber>2) && (param1!=1)){
+     param1 += 1;
+     StepNo1 = stepNumber;
+  }
+
+  //Photon 2
+   if((track->GetTrackID() == 2) && (stepNumber==2)){
+     param2 =0;
+   }
+   
+  if ((track->GetTrackID() == 2) && (stepNumber>2) && (param2!=1)){
+      param2 += 1;
+      StepNo2 = stepNumber;
+  }
+    
+  //Photon 1 first interaction
+  if ((track->GetTrackID() == 1) && (stepNumber == 2)){
+      
+    Tangle2::countA1 = 1; //parameter for determining which events are counted
+    Tangle2::posA_1 = 0.5*(prePos + postPos); 
+      
+    //calculate the angles 
     G4ThreeVector photon1_y_axis;  // dummy, i.e., not used.
     G4ThreeVector photon1_x_axis;  // dummy
-    G4double fCosTheta1;
-    //G4ThreeVector beamdir = G4ThreeVector(1,0,0);
+    G4double fCosTheta1, thetaA, phiA;
+    
     CalculateThetaPhi(postMomentumDir,
-		      // preMomentumDir,
-		      G4ThreeVector(1,0,0),
+		      preMomentumDir,
 		      photon1_y_axis,
 		      photon1_x_axis,
 		      fCosTheta1,
-		      Tangle2::thetaA,
-		      Tangle2::phiA);
-         }
-
-
-  //CRYSTAL B
-  if ((prePos == Tangle2::posB) && (track->GetTrackID() == 2)){
-    Tangle2::posB = postPos - prePos;
-    if (processDefinedStep->GetProcessName() == "compt"){
-      Tangle2::posB = postMomentumDir;}
-    G4ThreeVector photon2_y_axis;  // dummy, i.e., not used.
+		      thetaA,
+		      phiA);
+    
+      Tangle2::thetaA = thetaA;
+      Tangle2::phiA = phiA;
+      
+  }
+  
+    //Photon 1 second interaction
+  if ((track->GetTrackID() == 1) && (stepNumber == StepNo1)){
+    Tangle2::countA2 = 1; //parameter for determining which events are counted
+    Tangle2::posA_2 = 0.5*(prePos + postPos);
+    }
+  
+  
+  //Photon 2 first interaction
+  if ((track->GetTrackID() == 2)&& (stepNumber == 2)){
+    Tangle2::countB1 = 1; //parameter for determining which events are counted
+    Tangle2::posB_1 = 0.5*(prePos + postPos);
+    
+	//calculate angles 
+    G4ThreeVector photon2_y_axis;  // dummy, i.e., not used.s
     G4ThreeVector photon2_x_axis;  // dummy
-    G4double fCosTheta2; 
+    G4double fCosTheta2, thetaB, phiB; 
     CalculateThetaPhi(postMomentumDir,
-		      //preMomentumDir,
-		      G4ThreeVector(1,0,0),
+		      preMomentumDir,
+		      //G4ThreeVector(1,0,0),
 		      photon2_y_axis,
 		      photon2_x_axis,
 		      fCosTheta2,
-		      Tangle2::thetaB,
-		      Tangle2::phiB);
+		      thetaB,
+		      phiB);
+    
+    Tangle2::thetaB = thetaB;	
+    Tangle2::phiB = phiB;
     
   }
-
-  Tangle2::dphi = Tangle2::phiB - Tangle2::phiA;
-
-  /*while(true)
-    {
-      if (Tangle2::dphi > 180)
-	{
-	  Tangle2::dphi -= 360;
-	    }
-      if (Tangle2::dphi < -180)
-	{
-	  Tangle2::dphi += 360;
-	    }
-      else
-	{ break;
-	    }
-	    }*/
-
-  G4double zerophi = 0;
   
-  if (Tangle2::dphi <0){
-    Tangle2::dphi = Tangle2::dphi + 360;}
-
+  //Photon 2 second interaction
+  if ((track->GetTrackID() == 2)&& (stepNumber == StepNo2)){
+    Tangle2::countB2 = 1; //parameter for determining which events are counted
+    Tangle2::posB_2 = 0.5*(prePos + postPos);
+  }
   
-  if (Tangle2::dphi < 0.01){
-    zerophi +=1;}
- 
+  
 
+
+    
+//Count the number of compton scatters occuring in each respective crystal
   if (processDefinedStep->GetProcessName() == "compt"){
-    Tangle2::nb_Compt += 1;}
 
-  return;
+     for (G4int i = 0; i<18; i++){
+
+       if(stepNumber==2){
+	 Tangle2::nb_Compt[i]=0;
+	}
+    
+       if(postPV->GetCopyNo()==i){
+	Tangle2::nb_Compt[i] +=1;
+       }
+     }
+  } 
+
+  
+  
+//Calculate difference in phis 
+Tangle2::dphi = Tangle2::phiB - Tangle2::phiA;
+
+//Enforce 0<dphi<360 
+if (Tangle2::dphi <0){
+  Tangle2::dphi = Tangle2::dphi + 360;}
+  
+
+  
+  
+return;
 }
+

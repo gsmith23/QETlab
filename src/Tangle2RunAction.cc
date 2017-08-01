@@ -62,46 +62,77 @@ void Tangle2RunAction::BeginOfRunAction(const G4Run*)
   G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
   analysisManager->SetFirstNtupleId(1);
   
-  //Create a three-column ntuple
-  analysisManager->CreateNtuple("Tangle2", "Energy");
   // 1) total energy released in the crystal ## (double), MeV
-  analysisManager->CreateNtupleDColumn("crystal0");
-  analysisManager->CreateNtupleDColumn("crystal1");
-  analysisManager->CreateNtupleDColumn("crystal2");
-  analysisManager->CreateNtupleDColumn("crystal3");
-  analysisManager->CreateNtupleDColumn("crystal4");
-  analysisManager->CreateNtupleDColumn("crystal5");
-  analysisManager->CreateNtupleDColumn("crystal6");
-  analysisManager->CreateNtupleDColumn("crystal7");
-  analysisManager->CreateNtupleDColumn("crystal8");
-  analysisManager->CreateNtupleDColumn("crystal9");
-  analysisManager->CreateNtupleDColumn("crystal10");
-  analysisManager->CreateNtupleDColumn("crystal11");
-  analysisManager->CreateNtupleDColumn("crystal12");
-  analysisManager->CreateNtupleDColumn("crystal13");
-  analysisManager->CreateNtupleDColumn("crystal14");
-  analysisManager->CreateNtupleDColumn("crystal15");
-  analysisManager->CreateNtupleDColumn("crystal16");
-  analysisManager->CreateNtupleDColumn("crystal17");
-  //number of Compton scattering processes in an event
-  analysisManager->CreateNtupleIColumn("nb_Compt");
-  //momentum direction (unit vector) if 'true QE event'
-  //detector A (cryst 0-8)
-  analysisManager->CreateNtupleDColumn("AdX");
-  analysisManager->CreateNtupleDColumn("AdY");
-  analysisManager->CreateNtupleDColumn("AdZ");
-  //detector B (cryst 9-17)
-  analysisManager->CreateNtupleDColumn("BdX");
-  analysisManager->CreateNtupleDColumn("BdY");
-  analysisManager->CreateNtupleDColumn("BdZ");
-  //theta
+  analysisManager->CreateNtuple("Tangle2", "Tangle2");
+
+  analysisManager->CreateNtupleDColumn("edep0");
+  analysisManager->CreateNtupleDColumn("edep1");
+  analysisManager->CreateNtupleDColumn("edep2");
+  analysisManager->CreateNtupleDColumn("edep3");
+  analysisManager->CreateNtupleDColumn("edep4");
+  analysisManager->CreateNtupleDColumn("edep5");
+  analysisManager->CreateNtupleDColumn("edep6");
+  analysisManager->CreateNtupleDColumn("edep7");
+  analysisManager->CreateNtupleDColumn("edep8");
+  
+  analysisManager->CreateNtupleDColumn("edep9");
+  analysisManager->CreateNtupleDColumn("edep10");
+  analysisManager->CreateNtupleDColumn("edep11");
+  analysisManager->CreateNtupleDColumn("edep12");
+  analysisManager->CreateNtupleDColumn("edep13");
+  analysisManager->CreateNtupleDColumn("edep14");
+  analysisManager->CreateNtupleDColumn("edep15");
+  analysisManager->CreateNtupleDColumn("edep16");
+  analysisManager->CreateNtupleDColumn("edep17");
+   
+  /* analysisManager->CreateNtupleDColumn("edepColl1");
+  analysisManager->CreateNtupleDColumn("edepColl2");*/
+
+  //number of Compton scattering processes in each crystal
+  analysisManager->CreateNtupleIColumn("nb_Compt0");
+  analysisManager->CreateNtupleIColumn("nb_Compt1");
+  analysisManager->CreateNtupleIColumn("nb_Compt2");
+  analysisManager->CreateNtupleIColumn("nb_Compt3");
+  analysisManager->CreateNtupleIColumn("nb_Compt4");
+  analysisManager->CreateNtupleIColumn("nb_Compt5");
+  analysisManager->CreateNtupleIColumn("nb_Compt6");
+  analysisManager->CreateNtupleIColumn("nb_Compt7");
+  analysisManager->CreateNtupleIColumn("nb_Compt8");
+    
+  analysisManager->CreateNtupleIColumn("nb_Compt9");
+  analysisManager->CreateNtupleIColumn("nb_Compt10");
+  analysisManager->CreateNtupleIColumn("nb_Compt11");
+  analysisManager->CreateNtupleIColumn("nb_Compt12");
+  analysisManager->CreateNtupleIColumn("nb_Compt13");
+  analysisManager->CreateNtupleIColumn("nb_Compt14");
+  analysisManager->CreateNtupleIColumn("nb_Compt15");
+  analysisManager->CreateNtupleIColumn("nb_Compt16");
+  analysisManager->CreateNtupleIColumn("nb_Compt17");
+
+  //first interaction in A
+  analysisManager->CreateNtupleDColumn("XposA_1st");
+  analysisManager->CreateNtupleDColumn("YposA_1st");
+  analysisManager->CreateNtupleDColumn("ZposA_1st");
+  //second interaction in A
+  analysisManager->CreateNtupleDColumn("XposA_2nd");
+  analysisManager->CreateNtupleDColumn("YposA_2nd");
+  analysisManager->CreateNtupleDColumn("ZposA_2nd");
+  //first interaction in B
+  analysisManager->CreateNtupleDColumn("XposB_1st");
+  analysisManager->CreateNtupleDColumn("YposB_1st");
+  analysisManager->CreateNtupleDColumn("ZposB_1st");
+  //second interaction in B
+  analysisManager->CreateNtupleDColumn("XposB_2nd");
+  analysisManager->CreateNtupleDColumn("YposB_2nd");
+  analysisManager->CreateNtupleDColumn("ZposB_2nd");
+  
+  //theta and phi
   analysisManager->CreateNtupleDColumn("ThetaA");
-  analysisManager->CreateNtupleDColumn("ThetaB");
-  //phi
   analysisManager->CreateNtupleDColumn("PhiA");
+  analysisManager->CreateNtupleDColumn("ThetaB");
   analysisManager->CreateNtupleDColumn("PhiB");
   analysisManager->CreateNtupleDColumn("dPhi");
-    
+   
   analysisManager->FinishNtuple();
 
   analysisManager->OpenFile("Tangle2");
@@ -135,13 +166,13 @@ void Tangle2RunAction::EndOfRunAction(const G4Run* run)
     << Tangle2::nMasterEventsPh << " 511 keV deposit events"
     << G4endl;
     
-    Tangle2::outFile
-    << "#,RunId,nEventsPh"
-    << std::endl;
-    Tangle2::outFile
-    << "#," << run->GetRunID()
-    << ',' << Tangle2::nMasterEventsPh
-    << std::endl;
+    //   Tangle2::outFile
+    // << "#,RunId,nEventsPh"
+    //<< std::endl;
+    //Tangle2::outFile
+    //<< "#," << run->GetRunID()
+    //<< ',' << Tangle2::nMasterEventsPh
+    //<< std::endl;
   }
 
   G4AnalysisManager* man = G4AnalysisManager::Instance();

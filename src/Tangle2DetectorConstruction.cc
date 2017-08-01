@@ -99,7 +99,7 @@ G4VPhysicalVolume* Tangle2DetectorConstruction::Construct()
   G4bool checkOverlaps = true;
   
   // World
-  G4double world_sizeX = 108.5*mm;
+  G4double world_sizeX = 108.5*mm; 
   G4double world_sizeYZ  = 2*cm;
   G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
   
@@ -170,10 +170,10 @@ G4VPhysicalVolume* Tangle2DetectorConstruction::Construct()
   }
    
    //scattering disc
-  /*
-   G4Material* disc_mat = nist->FindOrBuildMaterial("G4_POLYETHYLENE");
+  
+  /* G4Material* disc_mat = nist->FindOrBuildMaterial("G4_POLYETHYLENE");
 
-  G4double disc_Rmax = 1*cm;
+  G4double disc_Rmax = 4*mm;
   G4double disc_Rmin = 0*mm;
   G4double disc_dX = 2*mm;
 
@@ -194,15 +194,15 @@ G4VPhysicalVolume* Tangle2DetectorConstruction::Construct()
 		    "disc",
 		    logicWorld,
 		    false,
-		    0,
+		    20,
 		    checkOverlaps);
-  */
+  
   	    
    //Collimator
 
-  G4RotationMatrix* rotm  = new G4RotationMatrix();
-  rotm->rotateY(90*deg);
-  
+  // G4RotationMatrix* rotm  = new G4RotationMatrix();
+  //rotm->rotateY(90*deg);
+   
   G4double coll_dZ = 25.25*mm;
   G4double coll_dY = 46.*mm;
   G4double coll_dX = 42.*mm;
@@ -244,7 +244,7 @@ G4VPhysicalVolume* Tangle2DetectorConstruction::Construct()
 		       "Coll_right",              
 		       logicWorld,             
 		       false,                  
-		       0,
+		       18,
 		       checkOverlaps);
      
 
@@ -254,9 +254,9 @@ G4VPhysicalVolume* Tangle2DetectorConstruction::Construct()
 		       "Coll_right",              
 		       logicWorld,             
 		       false,                  
-		       1,
+		       19,
 		       checkOverlaps); 
   
-  
+  */
   return physWorld; 
 }

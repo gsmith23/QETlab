@@ -20,6 +20,7 @@
 #include "G4VUserPrimaryGeneratorAction.hh"
 
 #include "G4ParticleGun.hh"
+#include "G4GeneralParticleSource.hh"
 #include "globals.hh"
 
 class G4ParticleGun;
@@ -34,10 +35,11 @@ class Tangle2PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 
     virtual void GeneratePrimaries(G4Event*);         
 
-    const G4ParticleGun* GetParticleGun() const { return fParticleGun; }
+  const G4ParticleGun* GetParticleGun() const { return fParticleGun; }
   
   private:
-    G4ParticleGun*  fParticleGun;
+  //G4GeneralParticleSource*  fParticleGun;
+  G4ParticleGun*  fParticleGun;
 };
 
 #endif
