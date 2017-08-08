@@ -286,7 +286,7 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
 
    for (G4int i = 0; i<9; i++){
 
-     if(stepNumber==StepANo1){
+     if((stepNumber==StepANo1) && (ID==IdA)){
 	 Tangle2::nb_Compt[i]=0; //set to zero at the beginning of each event
 	}
     
@@ -297,7 +297,7 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
 
    for (G4int i = 9; i<18; i++){
 	
-     if(stepNumber==StepBNo1){
+     if((stepNumber==StepBNo1) && (ID==IdB)){
 	  Tangle2::nb_Compt[i]=0; //set to zero at the beginning of each event
 	}
     
