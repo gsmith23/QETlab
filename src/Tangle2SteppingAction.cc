@@ -311,7 +311,7 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
  
    //--Calculate delta phi--
    
-   Tangle2::dphi = Tangle2::phiB - Tangle2::phiA;
+   Tangle2::dphi = Tangle2::phiB + Tangle2::phiA;
 
    //Enforce 0<dphi<360 
    if (Tangle2::dphi <0){
