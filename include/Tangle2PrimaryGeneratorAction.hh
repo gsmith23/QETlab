@@ -33,12 +33,13 @@ class Tangle2PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
   Tangle2PrimaryGeneratorAction();
   virtual ~Tangle2PrimaryGeneratorAction();
 
-    virtual void GeneratePrimaries(G4Event*);         
+  virtual void GeneratePrimaries(G4Event*);         
 
   const G4ParticleGun* GetParticleGun() const { return fParticleGun; }
   
   private:
   //G4GeneralParticleSource*  fParticleGun;
+  
   G4ParticleGun*  fParticleGun;
 };
 

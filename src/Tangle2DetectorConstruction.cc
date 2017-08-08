@@ -168,10 +168,10 @@ G4VPhysicalVolume* Tangle2DetectorConstruction::Construct()
 			 icrys,
 			 checkOverlaps);          
   }
-   
+    
    //scattering disc
   
-  /* G4Material* disc_mat = nist->FindOrBuildMaterial("G4_POLYETHYLENE");
+  /*  G4Material* disc_mat = nist->FindOrBuildMaterial("G4_POLYETHYLENE");
 
   G4double disc_Rmax = 4*mm;
   G4double disc_Rmin = 0*mm;
@@ -197,9 +197,9 @@ G4VPhysicalVolume* Tangle2DetectorConstruction::Construct()
 		    20,
 		    checkOverlaps);
   
-  	    
+		    
    //Collimator
-
+  /*
   // G4RotationMatrix* rotm  = new G4RotationMatrix();
   //rotm->rotateY(90*deg);
    
@@ -251,12 +251,12 @@ G4VPhysicalVolume* Tangle2DetectorConstruction::Construct()
      new G4PVPlacement(rotm,                      
 		       pos2,       
 		       logicColl,             
-		       "Coll_right",              
+		       "Coll_left",              
 		       logicWorld,             
 		       false,                  
 		       19,
 		       checkOverlaps); 
+  */  
   
-  */
   return physWorld; 
 }
