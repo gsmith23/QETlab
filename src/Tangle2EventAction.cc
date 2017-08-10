@@ -78,7 +78,8 @@ void Tangle2EventAction::EndOfEventAction(const G4Event*)
   //
   //'True QE event' should have nb_Compt = 2
   //AND unit vectors posA and posB
-  if ((nb_HitsA == 2) && (nb_HitsB == 2) && (eDepEvent > eThres)){
+  //if ((nb_HitsA == 2) && (nb_HitsB == 2) && (eDepEvent > eThres)){
+  if ((nb_HitsA >= 1) && (nb_HitsB >= 1) && (eDepEvent > eThres)){
       G4AnalysisManager* man = G4AnalysisManager::Instance();
       for (G4int i = 0 ; i < 18 ; i++){
 	man->FillNtupleDColumn(i, Tangle2::eDepCryst[i]/MeV);}

@@ -9,4 +9,4 @@
 
 /control/execute pretty.mac
 
-/control/execute gps.mac
+#/control/execute gps.mac
