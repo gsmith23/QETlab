@@ -39,19 +39,33 @@ void Tangle2EventAction::BeginOfEventAction(const G4Event*)
   fpTangle2VSteppingAction->BeginOfEventAction();
   for (G4int i = 0; i<18; i++){
     Tangle2::eDepCryst[i] = 0.;}
-  Tangle2::nb_Compt = 0;
-  Tangle2::posA = G4ThreeVector();
-  Tangle2::posB = G4ThreeVector();
+  Tangle2::eDepColl1 = 0;
+  Tangle2::eDepColl2 = 0;
+  for (G4int i = 0; i<18; i++){
+  Tangle2::nb_Compt[i] = 0.;}
+  Tangle2::posA_1 = G4ThreeVector(-99.,-99.,-99.);
+  Tangle2::posA_2 = G4ThreeVector(-99.,-99.,-99.);
+  Tangle2::posB_1 = G4ThreeVector(-99.,-99.,-99.);
+  Tangle2::posB_2 = G4ThreeVector(-99.,-99.,-99.);
+  Tangle2::thetaA = 0;
+  Tangle2::thetaB = 0;
+  Tangle2::phiA = 0;
+  Tangle2::phiB = 0;
+  Tangle2::dphi = 0;
+  Tangle2::thetaA2 = 500;
+  Tangle2::thetaB2 = 500;
+  Tangle2::phiA2 = 500;
+  Tangle2::phiB2 = 500;
+
+ 
+  
 }
 
 void Tangle2EventAction::EndOfEventAction(const G4Event*)
 {   
   fpTangle2VSteppingAction->EndOfEventAction();
   
-  // Always use a lock when writing a file in MT mode
-  G4AutoLock lock(&Tangle2::outFileMutex);
   
-
   //Check if the event is a 'true lab event'
   //that means exactly 4 fired crystals:
   //the cetral one and one outer one for each array
@@ -59,43 +73,77 @@ void Tangle2EventAction::EndOfEventAction(const G4Event*)
   G4int nb_HitsA = 0;
   G4int nb_HitsB = 0;
   G4double eDepEvent = 0.;
-  G4double eThres = 1*MeV; //in MeV
+  G4double eThres = 5*keV; //in keV
 
   //Array A
   for (G4int i = 0; i< 9 ; i++){
-    if (Tangle2::eDepCryst[i] > 0){
+    if (Tangle2::eDepCryst[i] > eThres){
       nb_HitsA += 1;
       eDepEvent += Tangle2::eDepCryst[i];}
    }
+  
   //Array B
   for (G4int i = 9; i< 18; i++){
-   if (Tangle2::eDepCryst[i] > 0){
+   if (Tangle2::eDepCryst[i] > eThres){
       nb_HitsB += 1;
       eDepEvent += Tangle2::eDepCryst[i];}
    }
 
+    
   //Output only 'true lab events' to the root file
-  //
-  //'True QE event' should have nb_Compt = 2
-  //AND unit vectors posA and posB
-  //if ((nb_HitsA == 2) && (nb_HitsB == 2) && (eDepEvent > eThres)){
-  if ((nb_HitsA >= 1) && (nb_HitsB >= 1) && (eDepEvent > eThres)){
-      G4AnalysisManager* man = G4AnalysisManager::Instance();
-      for (G4int i = 0 ; i < 18 ; i++){
-	man->FillNtupleDColumn(i, Tangle2::eDepCryst[i]/MeV);}
-      man->FillNtupleIColumn(18, Tangle2::nb_Compt);
-      man->FillNtupleDColumn(19, Tangle2::posA[0]/mm);
-      man->FillNtupleDColumn(20, Tangle2::posA[1]/mm);
-      man->FillNtupleDColumn(21, Tangle2::posA[2]/mm);
-      man->FillNtupleDColumn(22, Tangle2::posB[0]/mm);
-      man->FillNtupleDColumn(23, Tangle2::posB[1]/mm);
-      man->FillNtupleDColumn(24, Tangle2::posB[2]/mm);
-      
-      man->AddNtupleRow();
-  }
+  //And enforce first Compton angles to be non zero, meaning there has been at least one Compton interaction
 
-  //Record the number of events with 511 keV deposited in the central crystals
-  if ((nb_HitsA == 1) && (nb_HitsB == 1) && (eDepEvent > eThres)){
+   if ((Tangle2::eDepCryst[4] > eThres) && (Tangle2::eDepCryst[13] > eThres) &&  (Tangle2::thetaA !=0) &&(Tangle2::thetaB !=0)){
+ 
+    
+    G4AnalysisManager* man = G4AnalysisManager::Instance();
+    for (G4int i = 0 ; i < 18 ; i++){
+ 	man->FillNtupleDColumn(i, Tangle2::eDepCryst[i]/MeV);}
+
+        man->FillNtupleDColumn(18, Tangle2::eDepColl1/MeV);
+	man->FillNtupleDColumn(19, Tangle2::eDepColl2/MeV);
+      
+    for (G4int i = 0 ; i < 18 ; i++){
+  	man->FillNtupleIColumn(i+20, Tangle2::nb_Compt[i]);}
+
+	man->FillNtupleDColumn(38, Tangle2::posA_1[0]/mm);
+	man->FillNtupleDColumn(39, Tangle2::posA_1[1]/mm);
+	man->FillNtupleDColumn(40, Tangle2::posA_1[2]/mm);
+	
+	man->FillNtupleDColumn(41, Tangle2::posA_2[0]/mm);
+	man->FillNtupleDColumn(42, Tangle2::posA_2[1]/mm);
+	man->FillNtupleDColumn(43, Tangle2::posA_2[2]/mm);
+
+	man->FillNtupleDColumn(44, Tangle2::posB_1[0]/mm);
+	man->FillNtupleDColumn(45, Tangle2::posB_1[1]/mm);
+	man->FillNtupleDColumn(46, Tangle2::posB_1[2]/mm);
+
+	man->FillNtupleDColumn(47, Tangle2::posB_2[0]/mm);
+	man->FillNtupleDColumn(48, Tangle2::posB_2[1]/mm);
+	man->FillNtupleDColumn(49, Tangle2::posB_2[2]/mm);
+
+	man->FillNtupleDColumn(50, Tangle2::thetaA/radian);
+	man->FillNtupleDColumn(51, Tangle2::phiA/radian);
+	
+	man->FillNtupleDColumn(52, Tangle2::thetaB/radian);
+	man->FillNtupleDColumn(53, Tangle2::phiB/radian);
+      
+	man->FillNtupleDColumn(54, Tangle2::dphi/radian);
+
+	man->FillNtupleDColumn(55, Tangle2::thetaA2/radian);
+	man->FillNtupleDColumn(56, Tangle2::phiA2/radian);
+       
+	man->FillNtupleDColumn(57, Tangle2::thetaB2/radian);
+	man->FillNtupleDColumn(58, Tangle2::phiB2/radian);
+
+	man->AddNtupleRow();
+   }
+
+     
+
+  //Record the number of events with threshold energy deposited in the central crystals
+ 
+  if ((Tangle2::eDepCryst[4] > eThres) && (Tangle2::eDepCryst[13] > eThres)){
     Tangle2::nEventsPh += 1;
   }
   
