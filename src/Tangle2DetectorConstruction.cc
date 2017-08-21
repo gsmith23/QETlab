@@ -92,7 +92,9 @@ G4VPhysicalVolume* Tangle2DetectorConstruction::Construct()
   
   //Crystal parameters
   
-  G4double cryst_dX = 22*mm, cryst_dY = 4*mm, cryst_dZ = 3*mm;
+  //G4double cryst_dX = 22*mm, cryst_dY = 4*mm, cryst_dZ = 3*mm;
+  
+  G4double cryst_dX = 22*mm, cryst_dY = 4*mm, cryst_dZ = 4*mm;
 
   G4Material* cryst_mat   = nist->FindOrBuildMaterial("Lu2SiO5");
 
