@@ -63,7 +63,7 @@ void Tangle2RunAction::BeginOfRunAction(const G4Run*)
   analysisManager->SetFirstNtupleId(1);
   
   analysisManager->CreateNtuple("Tangle2", "Tangle2");
-
+  
   //energy deposited in crystals in A
   analysisManager->CreateNtupleDColumn("edep0");
   analysisManager->CreateNtupleDColumn("edep1");
@@ -143,9 +143,9 @@ void Tangle2RunAction::BeginOfRunAction(const G4Run*)
   analysisManager->FinishNtuple();
 
   analysisManager->OpenFile("Tangle2");
-
+  
   G4RunManager::GetRunManager()->SetRandomNumberStore(false);
-
+  
 }
 
 namespace {
@@ -157,27 +157,25 @@ void Tangle2RunAction::EndOfRunAction(const G4Run* run)
   if (G4Threading::IsWorkerThread()) {
 
     G4cout
-    << "Tangle2RunAction::EndOfRunAction: Thread: "
+      << "Tangle2RunAction::EndOfRunAction: Thread: "
     << G4Threading::G4GetThreadId()
     << ", " << Tangle2::nEventsPh << " 511 keV deposit events"
-    << G4endl;
+      << G4endl;
     
     // Always use a lock when writing to a location that is shared by threads
     G4AutoLock lock(&mutex);
     Tangle2::nMasterEventsPh += Tangle2::nEventsPh;
-
+    
   } else {  // Master thread
     Tangle2::nMasterEventsPh += Tangle2::nEventsPh;
     G4cout
-     << "Tangle2RunAction::EndOfRunAction: Master thread: "
-    << Tangle2::nMasterEventsPh << " 511 keV deposit events"
-    << G4endl;
-    
-  
+      << "Tangle2RunAction::EndOfRunAction: Master thread: "
+      << Tangle2::nMasterEventsPh << " 511 keV deposit events"
+      << G4endl;
   }
-
+  
   G4AnalysisManager* man = G4AnalysisManager::Instance();
   man->Write();
   man->CloseFile();
-
+  
 }

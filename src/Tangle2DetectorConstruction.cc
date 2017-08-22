@@ -53,7 +53,7 @@ void Tangle2DetectorConstruction::DefineMaterials()
 
   a=16.00*g/mole;
   G4Element*  elO = new G4Element(name="Oxygen", symbol="O", z=8., a);
-
+  
   a=28.09*g/mole;
   G4Element*  elSi = new G4Element(name="Silicon", symbol="Si", z=14., a);
   a=174.97*g/mole;
@@ -75,13 +75,11 @@ void Tangle2DetectorConstruction::DefineMaterials()
     
   G4double density_lead = 11.3*g/cm3;
   lead = new G4Material("lead",
-			 density_lead,
-			 1);
+			density_lead,
+			1);
   
   lead->AddElement(elPb, 1);
-
-
-
+  
   // Dump the Table of registered materials 
   G4cout << *(G4Material::GetMaterialTable()) << G4endl;
 }
@@ -168,94 +166,94 @@ G4VPhysicalVolume* Tangle2DetectorConstruction::Construct()
 			 icrys,
 			 checkOverlaps);          
   }
-    
-   //scattering disc
+  
+  //scattering disc
   
   /*  G4Material* disc_mat = nist->FindOrBuildMaterial("G4_POLYETHYLENE");
-
-  G4double disc_Rmax = 4*mm;
-  G4double disc_Rmin = 0*mm;
-  G4double disc_dX = 2*mm;
-
-  G4Tubs* solidDisc =
-    new G4Tubs("disc",
-	       disc_Rmin, disc_Rmax, 0.5*disc_dX, 0*deg, 360*deg);
-
-  G4LogicalVolume* logicDisc = new G4LogicalVolume(solidDisc,
-						   disc_mat,
-						   "DiscLV");
-  
-  G4RotationMatrix* rotm  = new G4RotationMatrix();
-  rotm->rotateY(90*deg);
-
-  new G4PVPlacement(rotm,
-		    G4ThreeVector(),
-		    logicDisc,
-		    "disc",
-		    logicWorld,
-		    false,
-		    20,
-		    checkOverlaps);
-  
-		    
-   //Collimator
-  /*
-  // G4RotationMatrix* rotm  = new G4RotationMatrix();
-  //rotm->rotateY(90*deg);
-   
-  G4double coll_dZ = 25.25*mm;
-  G4double coll_dY = 46.*mm;
-  G4double coll_dX = 42.*mm;
-
-  G4double inner_Rmax = 2.*mm;
-  G4double inner_Rmin = 0.*mm;
-
-  G4ThreeVector pos1 = G4ThreeVector(17.625*mm, 0.*mm, 0.*mm);
-  G4ThreeVector pos2 = G4ThreeVector(-17.625*mm, 0.*mm, 0.*mm);
-
-  G4Material* coll_mat   = nist->FindOrBuildMaterial("lead");
- 
-
-  G4Box* outerBox = new G4Box("Outer Box",
-			      0.5*coll_dX,
-			      0.5*coll_dY,
-			      0.5*coll_dZ);
-  G4Tubs* innerCyl = new G4Tubs("inner Cyl",
-				inner_Rmin,
-				inner_Rmax,
-				0.5*coll_dX,
-				0*deg,
-				360*deg);
- 
-  
-  G4SubtractionSolid* Collimator = new G4SubtractionSolid("Collimator",
-							  outerBox,
-							  innerCyl);
-
-  G4LogicalVolume* logicColl = new G4LogicalVolume(Collimator,
-						   //innerCyl,
-						   coll_mat,
-						   "Coll_LV");
-  
-
-     new G4PVPlacement(rotm,                      
-		       pos1,       
-		       logicColl,             
-		       "Coll_right",              
-		       logicWorld,             
-		       false,                  
-		       18,
-		       checkOverlaps);
-     
-
-     new G4PVPlacement(rotm,                      
-		       pos2,       
-		       logicColl,             
-		       "Coll_left",              
-		       logicWorld,             
-		       false,                  
-		       19,
-		       checkOverlaps); 
+      
+      G4double disc_Rmax = 4*mm;
+      G4double disc_Rmin = 0*mm;
+      G4double disc_dX = 2*mm;
+      
+      G4Tubs* solidDisc =
+      new G4Tubs("disc",
+      disc_Rmin, disc_Rmax, 0.5*disc_dX, 0*deg, 360*deg);
+      
+      G4LogicalVolume* logicDisc = new G4LogicalVolume(solidDisc,
+      disc_mat,
+      "DiscLV");
+      
+      G4RotationMatrix* rotm  = new G4RotationMatrix();
+      rotm->rotateY(90*deg);
+      
+      new G4PVPlacement(rotm,
+      G4ThreeVector(),
+      logicDisc,
+      "disc",
+      logicWorld,
+      false,
+      20,
+      checkOverlaps);
+      
+      
+      //Collimator
+      /*
+      // G4RotationMatrix* rotm  = new G4RotationMatrix();
+      //rotm->rotateY(90*deg);
+      
+      G4double coll_dZ = 25.25*mm;
+      G4double coll_dY = 46.*mm;
+      G4double coll_dX = 42.*mm;
+      
+      G4double inner_Rmax = 2.*mm;
+      G4double inner_Rmin = 0.*mm;
+      
+      G4ThreeVector pos1 = G4ThreeVector(17.625*mm, 0.*mm, 0.*mm);
+      G4ThreeVector pos2 = G4ThreeVector(-17.625*mm, 0.*mm, 0.*mm);
+      
+      G4Material* coll_mat   = nist->FindOrBuildMaterial("lead");
+      
+      
+      G4Box* outerBox = new G4Box("Outer Box",
+      0.5*coll_dX,
+      0.5*coll_dY,
+      0.5*coll_dZ);
+      G4Tubs* innerCyl = new G4Tubs("inner Cyl",
+      inner_Rmin,
+      inner_Rmax,
+      0.5*coll_dX,
+      0*deg,
+      360*deg);
+      
+      
+      G4SubtractionSolid* Collimator = new G4SubtractionSolid("Collimator",
+      outerBox,
+      innerCyl);
+      
+      G4LogicalVolume* logicColl = new G4LogicalVolume(Collimator,
+      //innerCyl,
+      coll_mat,
+      "Coll_LV");
+      
+      
+      new G4PVPlacement(rotm,                      
+      pos1,       
+      logicColl,             
+      "Coll_right",              
+      logicWorld,             
+      false,                  
+      18,
+      checkOverlaps);
+      
+      
+      new G4PVPlacement(rotm,                      
+      pos2,       
+      logicColl,             
+      "Coll_left",              
+      logicWorld,             
+      false,                  
+      19,
+      checkOverlaps); 
   */  
   
   return physWorld; 

@@ -44,49 +44,46 @@ void Tangle2SteppingAction::EndOfEventAction()
 }
 
 //Define a function for calculating angles theta and phi
-void CalculateThetaPhi
-  (const G4ThreeVector& v,
-   const G4ThreeVector& z_axis,
-   // Output quantities
-   G4ThreeVector& y_axis,
-   G4ThreeVector& x_axis,
-   G4double& cosTheta,
-   G4double& theta,
-   G4double& phi)
-  {
-    cosTheta = v*z_axis;
-    theta = std::acos(cosTheta) * 180/(pi); //convert to degrees
-    // Make y' perpendicular to global z-axis.
-    y_axis = (z_axis.cross(G4ThreeVector(0,0,1))).unit();
-    x_axis = y_axis.cross(z_axis);
-    const G4ThreeVector ontoXYPlane = v.cross(z_axis);
-    // ontoXYPlane is a vector in the xy-plane, but perpendicular to the
-    // projection of the scattered photon, so
-    const G4double projection_x = -ontoXYPlane*y_axis;
-    const G4double projection_y = ontoXYPlane*x_axis;
-    phi = std::atan2(projection_y,projection_x) * 180/(pi); //convert to degrees
-  }
+void CalculateThetaPhi (const G4ThreeVector& v,
+			const G4ThreeVector& z_axis,
+			// Output quantities
+			G4ThreeVector& y_axis,
+			G4ThreeVector& x_axis,
+			G4double& cosTheta,
+			G4double& theta,
+			G4double& phi)
+{
+  cosTheta = v*z_axis;
+  theta = std::acos(cosTheta) * 180/(pi); //convert to degrees
+  // Make y' perpendicular to global z-axis.
+  y_axis = (z_axis.cross(G4ThreeVector(0,0,1))).unit();
+  x_axis = y_axis.cross(z_axis);
+  const G4ThreeVector ontoXYPlane = v.cross(z_axis);
+  // ontoXYPlane is a vector in the xy-plane, but perpendicular to the
+  // projection of the scattered photon, so
+  const G4double projection_x = -ontoXYPlane*y_axis;
+  const G4double projection_y = ontoXYPlane*x_axis;
+  phi = std::atan2(projection_y,projection_x) * 180/(pi); //convert to degrees
+}
 
-
-//initialise parameters 
-G4int paramA, paramB,StepANo1, StepANo2, StepBNo1, StepBNo2, IdA, IdB;
-
+// initialise parameters 
+G4int paramA,paramB,StepANo1,StepANo2,StepBNo1,StepBNo2,IdA,IdB;
 
 void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
 {
   
-  G4StepPoint* preStepPoint = step->GetPreStepPoint();
+  G4StepPoint* preStepPoint  = step->GetPreStepPoint();
   G4StepPoint* postStepPoint = step->GetPostStepPoint();
-
+  
   G4double eDep = step->GetTotalEnergyDeposit();
-
+  
   //G4VPhysicalVolume* prePV = preStepPoint->GetPhysicalVolume();
   G4VPhysicalVolume* postPV = postStepPoint->GetPhysicalVolume();
 
-  G4ThreeVector prePos = preStepPoint->GetPosition();
+  G4ThreeVector prePos  = preStepPoint->GetPosition();
   G4ThreeVector postPos = postStepPoint->GetPosition();
 
-  G4ThreeVector preMomentumDir = preStepPoint->GetMomentumDirection();
+  G4ThreeVector preMomentumDir  = preStepPoint->GetMomentumDirection();
   G4ThreeVector postMomentumDir = postStepPoint->GetMomentumDirection();
 
   G4Track* track = step->GetTrack();
@@ -98,12 +95,17 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
   G4String processName = processDefinedStep->GetProcessName();
   //G4ParticleDefinition* particleDefinition = track->GetDefinition();
   //const G4VProcess* creatorProcess = track->GetCreatorProcess();
-
-    
+  
   //Fill energy array
-  if ((postPV) && (eDep > 0) && (postPV->GetName() != "disc") && (postPV->GetName() != "Coll_right") && (postPV->GetName() != "Coll_left")){
-    Tangle2::eDepCryst[postPV->GetCopyNo()] += eDep;}
-
+  if ( (postPV)   && 
+       (eDep > 0) && 
+       (postPV->GetName() != "disc")       &&
+       (postPV->GetName() != "Coll_right") &&
+       (postPV->GetName() != "Coll_left"))
+    {
+      Tangle2::eDepCryst[postPV->GetCopyNo()] += eDep;
+    }
+  
   //Fill Collimator energy depositions
   /* if((postPV->GetCopyNo()==18) && (eDep>0)){
     Tangle2::eDepColl1 +=eDep;}
@@ -111,16 +113,15 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
   if((postPV->GetCopyNo()==19) && (eDep>0)){
     Tangle2::eDepColl2 +=eDep;}
   */
-
-
-
-  //For the first particle and first step paramA1/B1 are set to zero
-  //These will be used to determine when the FIRST Compton event 
-  if((ID==2)&&(stepNumber==1)){
+  
+  // For the first particle and first step paramA1/B1 are set to zero
+  // These will be used to determine the FIRST Compton scattering
+  if( (ID==2) &&
+      (stepNumber==1)){
     paramA = 0;
     paramB = 0;
   }
-
+  
 
   //-------------Look only at PHOTONS undergoing COMPTON processes--------------
   
