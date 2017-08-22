@@ -35,6 +35,14 @@ int main(int argc,char** argv)
 
   // Choose the Random engine
   G4Random::setTheEngine(new CLHEP::RanecuEngine);
+  
+  // set seeds using system time
+  
+  G4long seeds[2];
+  time_t systime = time(NULL);
+  seeds[0] = (long) systime;
+  seeds[1] = (long) (systime*G4UniformRand());
+  G4Random::setTheSeeds(seeds);
 
 #ifdef G4MULTITHREADED
   G4MTRunManager* runManager = new G4MTRunManager;
@@ -60,7 +68,7 @@ int main(int argc,char** argv)
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
   UImanager->ApplyCommand("/control/execute vis.mac");
 
-  ui->SessionStart();
+  //ui->SessionStart();
 
   delete ui;
   delete visManager;
