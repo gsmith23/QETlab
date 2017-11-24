@@ -37,6 +37,13 @@ delete G4AnalysisManager::Instance();
 void Tangle2EventAction::BeginOfEventAction(const G4Event*)
 {
   fpTangle2VSteppingAction->BeginOfEventAction();
+  
+  Tangle2::nEvents += 1;
+  
+  G4cout << G4endl;
+  G4cout << " -----------------" << G4endl;
+  G4cout << "  event  " << Tangle2::nEvents << G4endl;
+
   for (G4int i = 0; i<18; i++){
     Tangle2::eDepCryst[i] = 0.;}
   Tangle2::eDepColl1 = 0;
@@ -85,8 +92,7 @@ void Tangle2EventAction::EndOfEventAction(const G4Event*)
      nb_HitsB += 1;
      eDepEvent += Tangle2::eDepCryst[i];}
    }
-<<<<<<< HEAD
-  
+
   // Output only 'true lab events' to the root file
   // And enforce first Compton angles to be non zero
   // meaning there has been at least one Compton interaction
@@ -100,25 +106,6 @@ void Tangle2EventAction::EndOfEventAction(const G4Event*)
       
       for (G4int i = 0 ; i < 18 ; i++){
  	man->FillNtupleDColumn(i, Tangle2::eDepCryst[i]/MeV);}
-=======
-
-    
-  //Output only 'true lab events' to the root file
-  //And enforce first Compton angles to be non zero, meaning there has been at least one Compton interaction
-
-   if ( (Tangle2::eDepCryst[4]  > eThres) && 
-	(Tangle2::eDepCryst[13] > eThres) &&  
-        (Tangle2::thetaA !=0)             &&
-	(Tangle2::thetaB !=0)                ){
- 
-    
-    G4AnalysisManager* man = G4AnalysisManager::Instance();
-    for (G4int i = 0 ; i < 18 ; i++){
- 	man->FillNtupleDColumn(i, Tangle2::eDepCryst[i]/MeV);}
-    
-        man->FillNtupleDColumn(18, Tangle2::eDepColl1/MeV);
-	man->FillNtupleDColumn(19, Tangle2::eDepColl2/MeV);
->>>>>>> e0c6049e0c67bf5e9d8bad1046d3f423db63c81b
       
       man->FillNtupleDColumn(18, Tangle2::eDepColl1/MeV);
       man->FillNtupleDColumn(19, Tangle2::eDepColl2/MeV);

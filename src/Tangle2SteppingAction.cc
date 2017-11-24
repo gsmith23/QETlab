@@ -66,12 +66,11 @@ void CalculateThetaPhi (const G4ThreeVector& v,
   phi = std::atan2(projection_y,projection_x) * 180/(pi); //convert to degrees
 }
 
-// initialise parameters 
+// declare parameters 
 G4int paramA,paramB,StepANo1,StepANo2,StepBNo1,StepBNo2,IdA,IdB;
 
 void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
 {
-  
   G4StepPoint* preStepPoint  = step->GetPreStepPoint();
   G4StepPoint* postStepPoint = step->GetPostStepPoint();
   
@@ -96,7 +95,34 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
   //G4ParticleDefinition* particleDefinition = track->GetDefinition();
   //const G4VProcess* creatorProcess = track->GetCreatorProcess();
   
-  //Fill energy array
+  
+  G4cout << G4endl;
+  if      (Tangle2::positrons  && ID==1 && stepNumber ==1)
+    G4cout << " positrons " << G4endl;
+  else if (!Tangle2::positrons && ID==2 && stepNumber ==1)
+    G4cout << " back2back " << G4endl;
+  else 
+    G4cout << " other " << G4endl;
+
+  G4int firstTrackID = 1;
+  
+  if(Tangle2::positrons)
+    firstTrackID = 2; 
+  
+  G4cout << G4endl;
+  G4cout << " paramA   = " << paramA   << G4endl;
+  G4cout << " paramB   = " << paramB   << G4endl;
+  G4cout << " StepANo1 = " << StepANo1 << G4endl;
+  G4cout << " StepANo2 = " << StepANo2 << G4endl;
+  G4cout << " StepBNo1 = " << StepBNo1 << G4endl;
+  G4cout << " StepBNo2 = " << StepBNo2 << G4endl;
+  G4cout << " IdA      = " << IdA      << G4endl;
+  G4cout << " IdB      = " << IdB      << G4endl;
+  
+  // Fill energy array
+  // This comes before the 
+  // conditions on processes
+  // Is this placement optimised?
   if ( (postPV)   && 
        (eDep > 0) && 
        (postPV->GetName() != "disc")       &&
@@ -114,39 +140,43 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
     Tangle2::eDepColl2 +=eDep;}
   */
   
-  // For the first particle and first step paramA1/B1 are set to zero
-  // These will be used to determine the FIRST Compton scattering
+  G4cout << G4endl;
+  G4cout << " particleName = " << particleName << G4endl;
+  G4cout << " processName  = " << processName  << G4endl;
+  G4cout << " ID = " << ID << G4endl;
+  G4cout << " stepNumber = " << stepNumber << G4endl;
+  
+  // for positrons use 2
+  // for back2back use 1
   if( (ID==2) &&
       (stepNumber==1)){
+    
+    G4cout << " ------------------------- " << G4endl;
+    G4cout << " Setting params to zero    " << G4endl;
+    
     paramA = 0;
     paramB = 0;
   }
   
-
-  //-------------Look only at PHOTONS undergoing COMPTON processes--------------
+  //-------------------------
+  // From here we are now only 
+  // interested in Compton 
+  // scattering. 
+  // For other processes energy 
+  // deposited was the only
+  // quantity of interest
+  if( (particleName != "gamma") || 
+      (processName  != "compt") ) 
+    return;
   
-  // return if particle is NOT a photon and the interaction is NOT Compton 
+  //
+  // array A is in +ive x direction
+  if((postPos[0]>0))
+    IdA =  ID;
   
-  if((particleName != "gamma") || (processName != "compt")) {
-      return;
-    }
-  
-
-  if((postPos[0]>0)){ 
-    
-   IdA =  ID;
-    
-   }
-
-    
-  if(postPos[0]<0){ 
-    
+  // array B is in -ive x direction
+  if(postPos[0]<0)
     IdB = ID;
-      
-    }
-  
-
-
   
   //------Determine Step Numbers of relevant interactions----------------
     
@@ -160,28 +190,28 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
   
   //Photon 1
   if((ID == IdA) && (paramA == 0)){ //first compton event for A
-     paramA = 1;
-     StepANo1 = stepNumber;
-   }
+    paramA = 1;
+    StepANo1 = stepNumber;
+  }
    
   if ((ID == IdA) && (stepNumber>StepANo1) && (paramA==1)){ //second compton event for A
-     paramA = 2;
-     StepANo2 = stepNumber;
+    paramA = 2;
+    StepANo2 = stepNumber;
   }
-
+  
   //Photon 2
-   if((ID == IdB) && (paramB ==0)){ //first compton event for B
-     paramB = 1;
-     StepBNo1 = stepNumber;
-   }
-   
-   if ((ID == IdB) && (stepNumber>StepBNo1) && (paramB==1)){ //second compton event for B
-     paramB = 2;
-     StepBNo2 = stepNumber;
+  if((ID == IdB) && (paramB ==0)){ //first compton event for B
+    paramB = 1;
+    StepBNo1 = stepNumber;
+  }
+  
+  if ((ID == IdB) && (stepNumber>StepBNo1) && (paramB==1)){ //second compton event for B
+    paramB = 2;
+    StepBNo2 = stepNumber;
   }
 
  
-    
+  
   //-----------------Photon 1----------------
    // if (ID == IdA){
    if(postPos[0]>0){ //photon has hit detector A
@@ -283,44 +313,35 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
   }
   
    
-//Count the number of compton scatters occuring in each respective crystal
-
+   // Count the number of compton scatters
+   // occuring in each respective crystal
    for (G4int i = 0; i<9; i++){
-
+     
      if((stepNumber==StepANo1) && (ID==IdA)){
-	 Tangle2::nb_Compt[i]=0; //set to zero at the beginning of each event
-	}
-    
-     if(postPV->GetCopyNo()==i){
-	Tangle2::nb_Compt[i] +=1;
-       }
+       Tangle2::nb_Compt[i]=0; //set to zero at the beginning of each event
      }
-
-   for (G4int i = 9; i<18; i++){
-	
-     if((stepNumber==StepBNo1) && (ID==IdB)){
-	  Tangle2::nb_Compt[i]=0; //set to zero at the beginning of each event
-	}
-    
+     
      if(postPV->GetCopyNo()==i){
-	  Tangle2::nb_Compt[i] +=1;
-	}
+       Tangle2::nb_Compt[i] +=1;
+     }
    }
-	
-  
-
- 
-   //--Calculate delta phi--
+   
+   for (G4int i = 9; i<18; i++){
+     
+     if((stepNumber==StepBNo1) && (ID==IdB)){
+       Tangle2::nb_Compt[i]=0; //set to zero at the beginning of each event
+     }
+     
+     if(postPV->GetCopyNo()==i){
+       Tangle2::nb_Compt[i] +=1;
+     }
+   }
    
    Tangle2::dphi = Tangle2::phiB + Tangle2::phiA;
-
-   //Enforce 0<dphi<360 
+   
    if (Tangle2::dphi <0){
      Tangle2::dphi = Tangle2::dphi + 360;}
- 
-
-
-
-return;
+   
+   return;
 }
 

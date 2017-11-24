@@ -28,16 +28,17 @@
 #include "G4UImanager.hh"
 #include "G4VisExecutive.hh"
 
+
 int main(int argc,char** argv)
 {
   // Do this first to capture all output
   G4UIExecutive* ui = new G4UIExecutive(argc, argv);
 
+   
   // Choose the Random engine
   G4Random::setTheEngine(new CLHEP::RanecuEngine);
   
-  // set seeds using system time
-  
+  // seed from system time
   G4long seeds[2];
   time_t systime = time(NULL);
   seeds[0] = (long) systime;
@@ -56,7 +57,9 @@ int main(int argc,char** argv)
   G4PhysListFactory factory;
   G4VModularPhysicsList* physList = factory.GetReferencePhysList("FTFP_BERT");
   physList->SetVerboseLevel(verbose = 1);
+  
   physList->ReplacePhysics(new G4EmLivermorePolarizedPhysics);
+
   // physList->ReplacePhysics(new G4EmLivermorePhysics); 
   runManager->SetUserInitialization(physList);
 
@@ -67,7 +70,8 @@ int main(int argc,char** argv)
 
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
   UImanager->ApplyCommand("/control/execute vis.mac");
-
+  
+  // comment in for GUI
   //ui->SessionStart();
 
   delete ui;

@@ -52,18 +52,26 @@ void Tangle2DetectorConstruction::DefineMaterials()
   G4String name, symbol;
 
   a=16.00*g/mole;
-  G4Element*  elO = new G4Element(name="Oxygen", symbol="O", z=8., a);
-
+  G4Element*  elO = new G4Element(name="Oxygen",
+				  symbol="O",
+				  z=8., a);
   a=28.09*g/mole;
-  G4Element*  elSi = new G4Element(name="Silicon", symbol="Si", z=14., a);
+  G4Element*  elSi = new G4Element(name="Silicon",
+				   symbol="Si",
+				   z=14., a);
   a=174.97*g/mole;
-  G4Element* elLu = new G4Element(name="Lutetium", symbol="Lu", z=71., a);
+  G4Element* elLu = new G4Element(name="Lutetium",
+				  symbol="Lu",
+				  z=71., a);
   a=207.2*g/mole;
-  G4Element*  elPb = new G4Element(name="Lead", symbol="Pb", z=82., a);     
+  G4Element*  elPb = new G4Element(name="Lead",
+				   symbol="Pb",
+				   z=82., a);     
 
   G4Material* LSO;
   G4Material* lead;
 
+  // Change to LYSO
   G4double density = 7.4*g/cm3;
   LSO = new G4Material("Lu2SiO5",   
                        density,    
@@ -79,9 +87,7 @@ void Tangle2DetectorConstruction::DefineMaterials()
 			1);
   
   lead->AddElement(elPb, 1);
-
-
-
+  
   // Dump the Table of registered materials 
   G4cout << *(G4Material::GetMaterialTable()) << G4endl;
 }
@@ -90,24 +96,23 @@ G4VPhysicalVolume* Tangle2DetectorConstruction::Construct()
 {  
   G4NistManager* nist = G4NistManager::Instance();
   
-  //Crystal parameters
-  
-  //G4double cryst_dX = 22*mm, cryst_dY = 4*mm, cryst_dZ = 3*mm;
-  
+  // Crystal Arrays
   G4double cryst_dX = 22*mm, cryst_dY = 4*mm, cryst_dZ = 4*mm;
 
   G4Material* cryst_mat   = nist->FindOrBuildMaterial("Lu2SiO5");
-
+  
   G4bool checkOverlaps = true;
   
   // World
-  G4double world_sizeX = 108.5*mm; 
-  G4double world_sizeYZ  = 2*cm;
+  G4double world_sizeX  = 108.5*mm; 
+  G4double world_sizeYZ = 2*cm;
   G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
   
   G4Box* solidWorld =    
-    new G4Box("World",                       
-	      0.5*world_sizeX, 0.5*world_sizeYZ, 0.5*world_sizeYZ);
+    new G4Box("World",
+	      0.5*world_sizeX,
+	      0.5*world_sizeYZ,
+	      0.5*world_sizeYZ);
       
   G4LogicalVolume* logicWorld =                         
     new G4LogicalVolume(solidWorld,          
@@ -123,7 +128,7 @@ G4VPhysicalVolume* Tangle2DetectorConstruction::Construct()
                       false,                 
                       0,                     
                       checkOverlaps);        
-                     
+  
   // Crystal
   G4double pos_dX = 0.5*(world_sizeX-cryst_dX);
   

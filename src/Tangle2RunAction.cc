@@ -45,17 +45,19 @@ Tangle2RunAction::~Tangle2RunAction()
 
 void Tangle2RunAction::BeginOfRunAction(const G4Run*)
 {
-   G4cout
-  << "Tangle2RunAction::BeginOfRunAction: Thread: "
-  << G4Threading::G4GetThreadId()
-  << G4endl;
-
+  G4cout
+    << "Tangle2RunAction::BeginOfRunAction: Thread: "
+    << G4Threading::G4GetThreadId()
+    << G4endl;
+  
   if (G4Threading::IsWorkerThread()) {
 
+    Tangle2::nEvents   = 0;
     Tangle2::nEventsPh = 0;
    
   } else {  // Master thread
 
+    Tangle2::nMasterEvents = 0;
     Tangle2::nMasterEventsPh = 0;
   }
 
@@ -158,18 +160,22 @@ void Tangle2RunAction::EndOfRunAction(const G4Run* run)
 
     G4cout
       << "Tangle2RunAction::EndOfRunAction: Thread: "
-    << G4Threading::G4GetThreadId()
-    << ", " << Tangle2::nEventsPh << " 511 keV deposit events"
+      << G4Threading::G4GetThreadId()
+      << ", " << Tangle2::nEvents << " events, "
+      << ", " << Tangle2::nEventsPh << " 511 keV deposit events"
       << G4endl;
     
     // Always use a lock when writing to a location that is shared by threads
     G4AutoLock lock(&mutex);
+    Tangle2::nMasterEvents += Tangle2::nEvents;
     Tangle2::nMasterEventsPh += Tangle2::nEventsPh;
     
   } else {  // Master thread
+    Tangle2::nMasterEvents += Tangle2::nEvents;
     Tangle2::nMasterEventsPh += Tangle2::nEventsPh;
     G4cout
       << "Tangle2RunAction::EndOfRunAction: Master thread: "
+      << Tangle2::nMasterEvents   << " events, "
       << Tangle2::nMasterEventsPh << " 511 keV deposit events"
       << G4endl;
   }
