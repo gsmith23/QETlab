@@ -36,14 +36,17 @@ Tangle2SteppingAction::Tangle2SteppingAction
 {}
 
 void Tangle2SteppingAction::BeginOfEventAction()
-{
-}
+{}
 
 void Tangle2SteppingAction::EndOfEventAction()
-{
-}
+{}
 
-//Define a function for calculating angles theta and phi
+// Define a function for calculating angles theta and phi
+//--------------------------------------
+// To Do: 
+// Tidy confusing variable names
+// Use LOR as reference frame?
+//--------------------------------------
 void CalculateThetaPhi
   (const G4ThreeVector& v,
    const G4ThreeVector& z_axis,
@@ -68,79 +71,89 @@ void CalculateThetaPhi
   }
 
 
-//initialise parameters 
+// initialise parameters 
 G4int paramA, paramB,StepANo1, StepANo2, StepBNo1, StepBNo2, IdA, IdB;
 
 
 void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
 {
-  
-  G4StepPoint* preStepPoint = step->GetPreStepPoint();
-  G4StepPoint* postStepPoint = step->GetPostStepPoint();
 
+  G4StepPoint* preStepPoint  = step->GetPreStepPoint();
+  G4StepPoint* postStepPoint = step->GetPostStepPoint();
+  
   G4double eDep = step->GetTotalEnergyDeposit();
 
   //G4VPhysicalVolume* prePV = preStepPoint->GetPhysicalVolume();
   G4VPhysicalVolume* postPV = postStepPoint->GetPhysicalVolume();
 
-  G4ThreeVector prePos = preStepPoint->GetPosition();
+  G4ThreeVector prePos  = preStepPoint->GetPosition();
   G4ThreeVector postPos = postStepPoint->GetPosition();
 
   G4ThreeVector preMomentumDir = preStepPoint->GetMomentumDirection();
   G4ThreeVector postMomentumDir = postStepPoint->GetMomentumDirection();
 
-  G4Track* track = step->GetTrack();
+  G4Track* stepTrack = step->GetTrack();
   const G4VProcess* processDefinedStep = postStepPoint->GetProcessDefinedStep();
    
-  G4int stepNumber = track->GetCurrentStepNumber();
-  G4int ID = track->GetTrackID();
-  G4String particleName = track->GetDefinition()->GetParticleName();
-  G4String processName = processDefinedStep->GetProcessName();
-  //G4ParticleDefinition* particleDefinition = track->GetDefinition();
-  //const G4VProcess* creatorProcess = track->GetCreatorProcess();
-
-    
-  //Fill energy array
-  if ((postPV) && (eDep > 0) && (postPV->GetName() != "disc") && (postPV->GetName() != "Coll_right") && (postPV->GetName() != "Coll_left")){
-    Tangle2::eDepCryst[postPV->GetCopyNo()] += eDep;}
-
+  G4int    stepNumber   = stepTrack->GetCurrentStepNumber();
+  G4int    stepTrackID  = stepTrack->GetTrackID();
+  G4String particleName = stepTrack->GetDefinition()->GetParticleName();
+  G4String processName  = processDefinedStep->GetProcessName();
+  //G4ParticleDefinition* particleDefinition = stepTrack->GetDefinition();
+  //const G4VProcess* creatorProcess = stepTrack->GetCreatorProcess();
+  
+  // Fill energy array
+  if ((postPV)                            &&
+      (eDep > 0)                          &&
+      (postPV->GetName() != "disc")       &&
+      (postPV->GetName() != "Coll_right") &&
+      (postPV->GetName() != "Coll_left" ) 
+      ){ 
+    Tangle2::eDepCryst[postPV->GetCopyNo()] += eDep;
+  }
+  
   //Fill Collimator energy depositions
   /* if((postPV->GetCopyNo()==18) && (eDep>0)){
-    Tangle2::eDepColl1 +=eDep;}
-
-  if((postPV->GetCopyNo()==19) && (eDep>0)){
-    Tangle2::eDepColl2 +=eDep;}
+     Tangle2::eDepColl1 +=eDep;}
+     
+     if((postPV->GetCopyNo()==19) && (eDep>0)){
+     Tangle2::eDepColl2 +=eDep;}
   */
-
-
-
-  //For the first particle and first step paramA1/B1 are set to zero
-  //These will be used to determine when the FIRST Compton event 
-  if((ID==2)&&(stepNumber==1)){
+  
+  // 
+  // These will be used to determine when the FIRST Compton event 
+  
+  G4int firstGammaTrackID = 0;
+  
+  if     (usePositrons)
+    firstGammaTrackID = 2;
+  else if(useB2BGammas)
+    firstGammaTrackID = 1;
+    
+  if((stepTrackID==2) &&
+     (stepNumber ==1) ){
     paramA = 0;
-    paramB = 0;
-  }
-
-
+    paramB = 0; }
+  
   //-------------Look only at PHOTONS undergoing COMPTON processes--------------
   
   // return if particle is NOT a photon and the interaction is NOT Compton 
   
   if((particleName != "gamma") || (processName != "compt")) {
-      return;
-    }
-  
-
-  if((postPos[0]>0)){ 
+    return;
+  }
     
-   IdA =  ID;
     
-   }
-
+    if((postPos[0]>0)){ 
+    
+    IdA =  stepTrackID;
+    
+  }
+    
     
   if(postPos[0]<0){ 
     
-    IdB = ID;
+    IdB = stepTrackID;
       
     }
   
@@ -158,23 +171,23 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
       Set paramA/paramB to be 2, so no further Compton interactions are included */
   
   //Photon 1
-  if((ID == IdA) && (paramA == 0)){ //first compton event for A
+  if((stepTrackID == IdA) && (paramA == 0)){ //first compton event for A
      paramA = 1;
      StepANo1 = stepNumber;
    }
    
-  if ((ID == IdA) && (stepNumber>StepANo1) && (paramA==1)){ //second compton event for A
+  if ((stepTrackID == IdA) && (stepNumber>StepANo1) && (paramA==1)){ //second compton event for A
      paramA = 2;
      StepANo2 = stepNumber;
   }
 
   //Photon 2
-   if((ID == IdB) && (paramB ==0)){ //first compton event for B
+   if((stepTrackID == IdB) && (paramB ==0)){ //first compton event for B
      paramB = 1;
      StepBNo1 = stepNumber;
    }
    
-   if ((ID == IdB) && (stepNumber>StepBNo1) && (paramB==1)){ //second compton event for B
+   if ((stepTrackID == IdB) && (stepNumber>StepBNo1) && (paramB==1)){ //second compton event for B
      paramB = 2;
      StepBNo2 = stepNumber;
   }
@@ -182,7 +195,7 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
  
     
   //-----------------Photon 1----------------
-   // if (ID == IdA){
+   // if (stepTrackID == IdA){
    if(postPos[0]>0){ //photon has hit detector A
   //first interaction
   if (stepNumber == StepANo1){
@@ -232,7 +245,7 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
   }
    
   //---------------------Photon 2-------------------------
-   //if (ID == IdB){
+   //if (stepTrackID == IdB){
    if(postPos[0]<0){ //photon has hit detector B
   //first interaction
 	if (stepNumber == StepBNo1){
@@ -286,7 +299,7 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
 
    for (G4int i = 0; i<9; i++){
 
-     if((stepNumber==StepANo1) && (ID==IdA)){
+     if((stepNumber==StepANo1) && (stepTrackID==IdA)){
 	 Tangle2::nb_Compt[i]=0; //set to zero at the beginning of each event
 	}
     
@@ -297,7 +310,7 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
 
    for (G4int i = 9; i<18; i++){
 	
-     if((stepNumber==StepBNo1) && (ID==IdB)){
+     if((stepNumber==StepBNo1) && (stepTrackID==IdB)){
 	  Tangle2::nb_Compt[i]=0; //set to zero at the beginning of each event
 	}
     
