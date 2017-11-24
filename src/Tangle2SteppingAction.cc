@@ -130,8 +130,8 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
   else if(useB2BGammas)
     firstGammaTrackID = 1;
     
-  if((stepTrackID==2) &&
-     (stepNumber ==1) ){
+  if((stepTrackID == firstGammaTrackID) &&
+     (stepNumber  == 1) ){
     paramA = 0;
     paramB = 0; }
   

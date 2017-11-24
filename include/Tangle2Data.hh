@@ -15,9 +15,14 @@ class G4VPhysicalVolume;
 // This is a lazy way of sharing memory. To avoid polluting the global
 // namespace we define our own distinctive namespace.
 namespace Tangle2 {
+
+  extern G4bool positrons;
   
-  extern G4int nMasterEventsPh;
+  extern G4int nMasterEvents;
+  extern G4int nMasterEventsPh;  
+  
   // Worker quantities
+  extern G4ThreadLocal G4int nEvents;
   extern G4ThreadLocal G4int nEventsPh;
   extern G4ThreadLocal G4double eDepEvent;
   extern G4ThreadLocal G4double eDepCryst[18];
@@ -37,7 +42,7 @@ namespace Tangle2 {
   extern G4ThreadLocal G4double thetaB2;
   extern G4ThreadLocal G4double phiA2;
   extern G4ThreadLocal G4double phiB2;
-  
+
 }
 
 #endif

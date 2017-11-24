@@ -1,9 +1,15 @@
 #include "Tangle2Data.hh"
 
+// change to false to run with 
+// back to back photons
+G4bool Tangle2::positrons = false;
 
+// For runs with multi-threading
 G4int Tangle2::nMasterEventsPh = 0;
+G4int Tangle2::nMasterEvents = 0;
 
 // Worker quantities
+G4ThreadLocal G4int Tangle2::nEvents = 0;
 G4ThreadLocal G4int Tangle2::nEventsPh = 0;
 G4ThreadLocal G4double Tangle2::eDepEvent = 0.;
 G4ThreadLocal G4double Tangle2::eDepCryst[18] ={0.};
@@ -23,6 +29,3 @@ G4ThreadLocal G4double Tangle2::thetaA2 = 0;
 G4ThreadLocal G4double Tangle2::thetaB2 = 0;
 G4ThreadLocal G4double Tangle2::phiA2 = 0;
 G4ThreadLocal G4double Tangle2::phiB2 = 0;
-
-
-
