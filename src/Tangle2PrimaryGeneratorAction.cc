@@ -60,12 +60,16 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   G4ParticleDefinition* particle2
   = particleTable->FindParticle(particleName="e+");
   
+  // Use positrons or
+  // back to back photons
   G4bool generatePositrons = false;
   //
   if(Tangle2::positrons==true)
     generatePositrons = true;
   
-  G4bool fixedAxisB2B = true; // <=> !generatePositrons
+  // For back to back photons
+  // a fixed axis beam can be chosen
+  G4bool fixedAxisB2B = true; // only use with (!generatePositrons)
   
   //-----------------------Back to back photons------------------------ 
   if(!generatePositrons){

@@ -33,8 +33,7 @@ int main(int argc,char** argv)
 {
   // Do this first to capture all output
   G4UIExecutive* ui = new G4UIExecutive(argc, argv);
-
-   
+  
   // Choose the Random engine
   G4Random::setTheEngine(new CLHEP::RanecuEngine);
   
@@ -44,19 +43,22 @@ int main(int argc,char** argv)
   seeds[0] = (long) systime;
   seeds[1] = (long) (systime*G4UniformRand());
   G4Random::setTheSeeds(seeds);
-
+  
 #ifdef G4MULTITHREADED
   G4MTRunManager* runManager = new G4MTRunManager;
 #else
   G4RunManager* runManager = new G4RunManager;
 #endif
-
+  
   runManager->SetUserInitialization(new Tangle2DetectorConstruction);
-
+  
   G4int verbose;
   G4PhysListFactory factory;
+  
   G4VModularPhysicsList* physList = factory.GetReferencePhysList("FTFP_BERT");
   physList->SetVerboseLevel(verbose = 1);
+  
+  
   
   physList->ReplacePhysics(new G4EmLivermorePolarizedPhysics);
 
@@ -73,7 +75,7 @@ int main(int argc,char** argv)
 
   // Visualiser
   ui->SessionStart();
-
+  
   delete ui;
   delete visManager;
   delete runManager;
