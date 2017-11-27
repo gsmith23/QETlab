@@ -13,6 +13,7 @@
 // *******************************************************************
 // $Id$
 // John Allison  22nd May 2017
+// Gary Smith    27th Nov 2017
 
 #ifdef G4MULTITHREADED
 #include "G4MTRunManager.hh"
@@ -28,6 +29,7 @@
 #include "G4UImanager.hh"
 #include "G4VisExecutive.hh"
 
+#include "Tangle2Data.hh"
 
 int main(int argc,char** argv)
 {
@@ -37,7 +39,7 @@ int main(int argc,char** argv)
   // Choose the Random engine
   G4Random::setTheEngine(new CLHEP::RanecuEngine);
   
-  // seed from system time
+  // Set seed using system time
   G4long seeds[2];
   time_t systime = time(NULL);
   seeds[0] = (long) systime;
@@ -50,19 +52,25 @@ int main(int argc,char** argv)
   G4RunManager* runManager = new G4RunManager;
 #endif
   
-  runManager->SetUserInitialization(new Tangle2DetectorConstruction);
+  // Make your beam choices here
+  Tangle2::positrons = false;
+  Tangle2::fixedAxis = true;
+  Tangle2::perpPol   = false;
+ 
+  // View the results?
+  G4bool useVisualiser = true;
   
+  runManager->SetUserInitialization(new Tangle2DetectorConstruction);
+    
   G4int verbose;
   G4PhysListFactory factory;
   
   G4VModularPhysicsList* physList = factory.GetReferencePhysList("FTFP_BERT");
   physList->SetVerboseLevel(verbose = 1);
   
-  
-  
   physList->ReplacePhysics(new G4EmLivermorePolarizedPhysics);
-
   // physList->ReplacePhysics(new G4EmLivermorePhysics); 
+
   runManager->SetUserInitialization(physList);
 
   runManager->SetUserInitialization(new Tangle2ActionInitialization);
@@ -73,7 +81,29 @@ int main(int argc,char** argv)
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
   UImanager->ApplyCommand("/control/execute vis.mac");
 
+  G4cout << " ------------------------------------------ " << G4endl;
+  G4cout << " QETlab simulation " << G4endl;
+  G4cout <<  G4endl;
+  G4cout << " Generating : " << G4endl;
+  
+  // Print beam choices to screen
+  if(Tangle2::positrons)
+    G4cout << " Positrons " << G4endl;
+  else{
+    G4cout << " Back to back gammas. " << G4endl;
+    if(Tangle2::fixedAxis)
+      G4cout << " On a fixed axis, " << G4endl;
+    else
+      G4cout << " Isotropically, " << G4endl;
+    if(Tangle2::perpPol)
+      G4cout << " with perpendicular polarisation. " << G4endl;
+    else
+      G4cout << " with random relative polarisation. " << G4endl;
+  }
+  G4cout << " ------------------------------------------ " << G4endl;
+  
   // Visualiser
+  if(useVisualiser)
   ui->SessionStart();
   
   delete ui;

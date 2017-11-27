@@ -64,13 +64,30 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   // back to back photons
   G4bool generatePositrons = false;
   //
-  if(Tangle2::positrons==true)
+  if(Tangle2::positrons)
     generatePositrons = true;
+
   
   // For back to back photons
   // a fixed axis beam can be chosen
-  G4bool fixedAxisB2B = true; // only use with (!generatePositrons)
+  G4bool generateFixedAxis = false; // only use with (!generatePositrons)
   
+  if (Tangle2::fixedAxis){
+    if(!generatePositrons)
+      generateFixedAxis = true;
+    else
+      G4cout << " Invalid choice: positrons with fixed axis " << G4endl;
+  }
+  
+  G4bool generatePerpPol = true;
+  
+  if(Tangle2::perpPol){
+    if(!generatePositrons) 
+      generatePerpPol = true;
+    else 
+      G4cout << " Invalid choice: positrons with perp pol  " << G4endl;
+  }
+
   //-----------------------Back to back photons------------------------ 
   if(!generatePositrons){
     
@@ -80,16 +97,16 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     G4double b = (2*(( (G4double) rand() / (RAND_MAX)) - 0.5));
     G4double c = (2*(( (G4double) rand() / (RAND_MAX)) - 0.5));
     
-    if (fixedAxisB2B){
+    if (generateFixedAxis){
       a = 1;
       b = 0;
       c = 0;
     }
     // random direction +/-8deg about x-axis
-    // or x-axis (fixedAxisB2B)
+    // or x-axis (generateFixedAxis)
     G4ThreeVector x_axis = G4ThreeVector(a, b, c); 
     
-    //photon1
+    // photon1
     fParticleGun->SetParticleDefinition(particle1);
     fParticleGun->SetParticleEnergy(511*keV);
     
@@ -97,23 +114,28 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
     fParticleGun->SetParticleMomentumDirection(x_axis);
     
-    //Generate a random vector direction perpendicular to x_axis  
+    // Generate a random vector direction perpendicular to x_axis  
     G4ThreeVector random = G4RandomDirection();
     random = random.cross(x_axis);
     
     fParticleGun->SetParticlePolarization(random);
     
-    //create vertex
+    // create vertex
     fParticleGun->GeneratePrimaryVertex(anEvent);
     
-    //photon 2
+    // photon 2
     fParticleGun->SetParticleDefinition(particle1);
     fParticleGun->SetParticleEnergy(511*keV);
     fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
     fParticleGun->SetParticleMomentumDirection(-x_axis);
     
-    //Define vector direction perpenicular to photon1 polarisation  
+    // Define vector direction perpenicular to photon1 polarisation  
+    
+    if(!generatePerpPol)
+      random = G4RandomDirection().cross(x_axis);
+    
     G4ThreeVector PerpPolarization = x_axis.cross(random);
+    
     fParticleGun->SetParticlePolarization(PerpPolarization);
         
     //create vertex

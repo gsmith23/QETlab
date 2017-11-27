@@ -17,6 +17,8 @@ class G4VPhysicalVolume;
 namespace Tangle2 {
 
   extern G4bool positrons;
+  extern G4bool fixedAxis;
+  extern G4bool perpPol;
   
   extern G4int nMasterEvents;
   extern G4int nMasterEventsPh;  
