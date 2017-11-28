@@ -43,7 +43,9 @@ void Tangle2SteppingAction::EndOfEventAction()
 {
 }
 
-//Define a function for calculating angles theta and phi
+// To do - tidy up confusing variable names:
+
+// Define a function for calculating angles theta and phi
 void CalculateThetaPhi (const G4ThreeVector& v,
 			const G4ThreeVector& z_axis,
 			// Output quantities
@@ -66,15 +68,38 @@ void CalculateThetaPhi (const G4ThreeVector& v,
   phi = std::atan2(projection_y,projection_x) * 180/(pi); //convert to degrees
 }
 
-// declare parameters 
-G4int paramA,paramB,StepANo1,StepANo2,StepBNo1,StepBNo2,IdA,IdB;
-
 void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
 {
+  
+  // Determine if this step is for a new event
+  // and if so initialise compton scattering 
+  // counting variables
+  const G4Event* evt = G4RunManager::GetRunManager()->GetCurrentEvent();
+  if(evt) eventID = evt->GetEventID();
+  
+  if(eventID!=previousEventID){
+    previousEventID = eventID;
+    
+    for (int i = 0 ; i < 18 ; i++)
+      Tangle2::nb_Compt[i]=0; 
+    
+    nComptonA     = 0;
+    nComptonB     = 0;
+    fstCompStep_A = 0;
+    sndCompStep_A = 0;
+    fstCompStep_B = 0;
+    sndCompStep_B = 0;
+    
+    // this boolean is used to skip angle calculations
+    // for events without Compt for both gammas
+    doubleComptEvent = true;
+    
+  }
+  
   G4StepPoint* preStepPoint  = step->GetPreStepPoint();
   G4StepPoint* postStepPoint = step->GetPostStepPoint();
   
-  G4double eDep = step->GetTotalEnergyDeposit();
+  G4double     eDep = step->GetTotalEnergyDeposit();
   
   //G4VPhysicalVolume* prePV = preStepPoint->GetPhysicalVolume();
   G4VPhysicalVolume* postPV = postStepPoint->GetPhysicalVolume();
@@ -86,43 +111,20 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
   G4ThreeVector postMomentumDir = postStepPoint->GetMomentumDirection();
 
   G4Track* track = step->GetTrack();
-  const G4VProcess* processDefinedStep = postStepPoint->GetProcessDefinedStep();
-   
-  G4int stepNumber = track->GetCurrentStepNumber();
-  G4int ID = track->GetTrackID();
+  
+  G4int    stepNumber   = track->GetCurrentStepNumber();
+  G4int    trackID      = track->GetTrackID();
   G4String particleName = track->GetDefinition()->GetParticleName();
-  G4String processName = processDefinedStep->GetProcessName();
+
+  const G4VProcess* processDefinedStep;
+  processDefinedStep    = postStepPoint->GetProcessDefinedStep();
+  G4String processName  = processDefinedStep->GetProcessName();
+  
   //G4ParticleDefinition* particleDefinition = track->GetDefinition();
   //const G4VProcess* creatorProcess = track->GetCreatorProcess();
   
-  
-  G4cout << G4endl;
-  if      (Tangle2::positrons  && ID==1 && stepNumber ==1)
-    G4cout << " positrons " << G4endl;
-  else if (!Tangle2::positrons && ID==2 && stepNumber ==1)
-    G4cout << " back2back " << G4endl;
-  else 
-    G4cout << " other " << G4endl;
-
-  G4int firstTrackID = 1;
-  
-  if(Tangle2::positrons)
-    firstTrackID = 2; 
-  
-  G4cout << G4endl;
-  G4cout << " paramA   = " << paramA   << G4endl;
-  G4cout << " paramB   = " << paramB   << G4endl;
-  G4cout << " StepANo1 = " << StepANo1 << G4endl;
-  G4cout << " StepANo2 = " << StepANo2 << G4endl;
-  G4cout << " StepBNo1 = " << StepBNo1 << G4endl;
-  G4cout << " StepBNo2 = " << StepBNo2 << G4endl;
-  G4cout << " IdA      = " << IdA      << G4endl;
-  G4cout << " IdB      = " << IdB      << G4endl;
-  
-  // Fill energy array
-  // This comes before the 
-  // conditions on processes
-  // Is this placement optimised?
+  // Record energy deposited in crystal
+  // for any processes
   if ( (postPV)   && 
        (eDep > 0) && 
        (postPV->GetName() != "disc")       &&
@@ -139,207 +141,159 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
     Tangle2::eDepColl2 +=eDep;}
   */
   
-  G4cout << G4endl;
-  G4cout << " particleName = " << particleName << G4endl;
-  G4cout << " processName  = " << processName  << G4endl;
-  G4cout << " ID = " << ID << G4endl;
-  G4cout << " stepNumber = " << stepNumber << G4endl;
-  
-  // for positrons use 2
-  // for back2back use 1
-  if( (ID==2) &&
-      (stepNumber==1)){
-    
-    G4cout << " ------------------------- " << G4endl;
-    G4cout << " Setting params to zero    " << G4endl;
-    
-    paramA = 0;
-    paramB = 0;
+  if(comments){
+    G4cout << G4endl;
+    G4cout << " particleName = " << particleName << G4endl;
+    G4cout << " processName  = " << processName  << G4endl;
+    G4cout << " trackID      = " << trackID      << G4endl;
+    G4cout << " stepNumber   = " << stepNumber   << G4endl;
   }
   
+  G4int fstGammaTrackID = 2;
+  G4int sndGammaTrackID = 1;
+  
+  if(Tangle2::positrons){
+    fstGammaTrackID = 3;
+    sndGammaTrackID = 2;
+  }
+  
+  // If there was no Compton scattering for the 
+  // first track then delta phi cant be calculated
+  if(!doubleComptEvent)
+    return;
+  
+  if ( trackID   == sndGammaTrackID &&
+       nComptonA == 0               &&
+       nComptonB == 0 ){
+    
+    if(comments){
+      G4cout << G4endl;
+      G4cout << " No Compton for first track " << G4endl;
+    }
+    
+    doubleComptEvent     = false;
+    return;
+  }
+    
   //-------------------------
   // From here we are now only 
-  // interested in Compton 
-  // scattering. 
-  // For other processes energy 
-  // deposited was the only
-  // quantity of interest
+  // interested in both photons 
+  // Compton scattering. 
+  
   if( (particleName != "gamma") || 
       (processName  != "compt") ) 
     return;
   
-  //
-  // array A is in +ive x direction
-  if((postPos[0]>0))
-    IdA =  ID;
-  
-  // array B is in -ive x direction
-  if(postPos[0]<0)
-    IdB = ID;
-  
-  //------Determine Step Numbers of relevant interactions----------------
+  // array A is in positive x direction
+  if     ( postPos[0] > 0) {
     
-  /*  Find the step number for the FIRST Compton interaction 
-      occurs when paramA/paramB equal 0
-      At this interaction set paramA/paramB to be 1
-      
-      Then find the step number for the SECOND Compton interaction
-      occurs when paramA/paramB equal 1
-      Set paramA/paramB to be 2, so no further Compton interactions are included */
-  
-  //Photon 1
-  if((ID == IdA) && (paramA == 0)){ //first compton event for A
-    paramA = 1;
-    StepANo1 = stepNumber;
-  }
-   
-  if ((ID == IdA) && (stepNumber>StepANo1) && (paramA==1)){ //second compton event for A
-    paramA = 2;
-    StepANo2 = stepNumber;
-  }
-  
-  //Photon 2
-  if((ID == IdB) && (paramB ==0)){ //first compton event for B
-    paramB = 1;
-    StepBNo1 = stepNumber;
-  }
-  
-  if ((ID == IdB) && (stepNumber>StepBNo1) && (paramB==1)){ //second compton event for B
-    paramB = 2;
-    StepBNo2 = stepNumber;
-  }
-
- 
-  
-  //-----------------Photon 1----------------
-  // if (ID == IdA){
-  if(postPos[0]>0){ //photon has hit detector A
-    //first interaction
-    if (stepNumber == StepANo1){
-      
+    // first Compton in A
+    if     (nComptonA == 0){ 
+      trackID_A1 = trackID;
+      nComptonA  = 1;
       Tangle2::posA_1 = postPos; 
       
-      //calculate the angles 
-      G4ThreeVector photon1_y_axis;  // dummy, i.e., not used.
-      G4ThreeVector photon1_x_axis;  // dummy
-      G4double fCosTheta1;
-    
-      CalculateThetaPhi(postMomentumDir,
-			preMomentumDir,
-			photon1_y_axis,
-			photon1_x_axis,
-			fCosTheta1,
+      beam_A   = preMomentumDir;
+      vScat_A1 = postMomentumDir;
+      
+      CalculateThetaPhi(vScat_A1,
+			beam_A,
+			y_axis_A1,
+			x_axis_A1,
+			cosTheta_A1,
 			Tangle2::thetaA,
 			Tangle2::phiA);
-
-      if (Tangle2::thetaA==0){
-	G4cout<<"theta A is zero"<<G4endl;
-      }
-
     }
+    // second Compton in A
+    else if(nComptonA == 1 &&
+	    trackID == trackID_A1){
       
-  
-
-    // second interaction
-    if (stepNumber == StepANo2){
-  
+      nComptonA       = 2;
       Tangle2::posA_2 = postPos;
-    
-      //calculate the angles 
-      G4ThreeVector photon1_y_axis2;  // dummy, i.e., not used.
-      G4ThreeVector photon1_x_axis2;  // dummy
-      G4double fCosThetaA2;
-    
-      CalculateThetaPhi(postMomentumDir,
-			preMomentumDir,
-			photon1_y_axis2,
-			photon1_x_axis2,
-			fCosThetaA2,
+      
+      vScat_A2 = postMomentumDir;  
+      
+      CalculateThetaPhi(vScat_A2,
+			beam_A,
+			y_axis_A2,
+			x_axis_A2,
+			cosTheta_A2,
 			Tangle2::thetaA2,
 			Tangle2::phiA2);
+      
     }
-    
   }
-   
-  //---------------------Photon 2-------------------------
-  //if (ID == IdB){
-  if(postPos[0]<0){ //photon has hit detector B
-    //first interaction
-    if (stepNumber == StepBNo1){
-   
-      Tangle2::posB_1 = postPos;
+  // array B is in negative x direction    
+  else if(postPos[0] < 0){ 
     
-      //calculate angles 
-      G4ThreeVector photon2_y_axis;  // dummy, i.e., not used.s
-      G4ThreeVector photon2_x_axis;  // dummy
-      G4double fCosTheta2; 
-      CalculateThetaPhi(postMomentumDir,
-			preMomentumDir,
-			//G4ThreeVector(1,0,0),
-			photon2_y_axis,
-			photon2_x_axis,
-			fCosTheta2,
+    //  first Compton in B
+    if     (nComptonB == 0){ 
+      trackID_B1 = trackID;
+      nComptonB = 1;
+      Tangle2::posB_1 = postPos;
+      
+      beam_B   = preMomentumDir;
+      vScat_B1 = postMomentumDir;
+      
+      CalculateThetaPhi(vScat_B1,
+			beam_B,
+			y_axis_B1,
+			x_axis_B1,
+			cosTheta_B1,
 			Tangle2::thetaB,
 			Tangle2::phiB);
-    
-      if (Tangle2::thetaB==0){
-	G4cout<<"theta B is zero"<<G4endl;
-      }
-    
     }
-  
-    //second interaction
-    if (stepNumber == StepBNo2){
+    // second Compton in B
+    else if(nComptonB == 1 &&
+	    trackID   == trackID_B1){
     
+      nComptonB = 2;
       Tangle2::posB_2 = postPos;
-
-    
-      //calculate angles 
-      G4ThreeVector photon2_y_axis2;  // dummy, i.e., not used.s
-      G4ThreeVector photon2_x_axis2;  // dummy
-      G4double fCosThetaB2; 
-      CalculateThetaPhi(postMomentumDir,
-			preMomentumDir,
-			//G4ThreeVector(1,0,0),
-			photon2_y_axis2,
-			photon2_x_axis2,
-			fCosThetaB2,
+      
+      vScat_B2 = postMomentumDir;  
+      
+      CalculateThetaPhi(vScat_B2,
+			beam_B,
+			y_axis_B2,
+			x_axis_B2,
+			cosTheta_B2,
 			Tangle2::thetaB2,
 			Tangle2::phiB2);
 
     }
+  }
 
+  
+
+  // Count the number of Compton scatters
+  // occuring in each crystal
+  G4int j = 0;
+  for (G4int i = 0; i < 9; i++){
+    
+    if(postPV->GetCopyNo()==i)
+      Tangle2::nb_Compt[i]++;
+    
+     j = i + 9;
+     if(postPV->GetCopyNo()==j)
+       Tangle2::nb_Compt[j]++;
   }
   
-   
-  // Count the number of compton scatters
-  // occuring in each respective crystal
-  for (G4int i = 0; i<9; i++){
-     
-    if((stepNumber==StepANo1) && (ID==IdA)){
-      Tangle2::nb_Compt[i]=0; //set to zero at the beginning of each event
+  if( nComptonA == 1 && nComptonB == 1){
+    
+    if(comments){
+      G4cout << G4endl;
+      G4cout << " --------------------------- " << G4endl;
+      G4cout << " Event " << eventID << G4endl;
+      G4cout << " Had Compt for both gammas "  << G4endl;
+      G4cout << " --------------------------- " << G4endl;
+      G4cout << G4endl;
     }
-     
-    if(postPV->GetCopyNo()==i){
-      Tangle2::nb_Compt[i] +=1;
-    }
+    
+    Tangle2::dphi = Tangle2::phiB + Tangle2::phiA;
+    
+    if (Tangle2::dphi < 0){
+      Tangle2::dphi = Tangle2::dphi + 360;}
   }
-   
-  for (G4int i = 9; i<18; i++){
-     
-    if((stepNumber==StepBNo1) && (ID==IdB)){
-      Tangle2::nb_Compt[i]=0; //set to zero at the beginning of each event
-    }
-     
-    if(postPV->GetCopyNo()==i){
-      Tangle2::nb_Compt[i] +=1;
-    }
-  }
-   
-  Tangle2::dphi = Tangle2::phiB + Tangle2::phiA;
-   
-  if (Tangle2::dphi <0){
-    Tangle2::dphi = Tangle2::dphi + 360;}
-   
+  
   return;
 }

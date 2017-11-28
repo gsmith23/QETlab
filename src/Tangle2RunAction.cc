@@ -143,7 +143,7 @@ void Tangle2RunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("PhiB_2nd");
    
   analysisManager->FinishNtuple();
-
+  
   analysisManager->OpenFile("Tangle2");
   
   G4RunManager::GetRunManager()->SetRandomNumberStore(false);
@@ -156,16 +156,21 @@ namespace {
 
 void Tangle2RunAction::EndOfRunAction(const G4Run* run)
 {
+  
+  G4cout << G4endl;
+  
   if (G4Threading::IsWorkerThread()) {
-
+    
     G4cout
       << "Tangle2RunAction::EndOfRunAction: Thread: "
-      << G4Threading::G4GetThreadId()
-      << ", " << Tangle2::nEvents << " events, "
-      << ", " << Tangle2::nEventsPh << " 511 keV deposit events"
-      << G4endl;
+      << G4Threading::G4GetThreadId() << G4endl;
     
-    // Always use a lock when writing to a location that is shared by threads
+    G4cout << Tangle2::nEvents << " events, "
+	   << ", " << Tangle2::nEventsPh << " 511 keV deposit events"
+	   << G4endl;
+    
+    // Always use a lock when writing to a 
+    // location that is shared by threads
     G4AutoLock lock(&mutex);
     Tangle2::nMasterEvents += Tangle2::nEvents;
     Tangle2::nMasterEventsPh += Tangle2::nEventsPh;
@@ -175,11 +180,13 @@ void Tangle2RunAction::EndOfRunAction(const G4Run* run)
     Tangle2::nMasterEventsPh += Tangle2::nEventsPh;
     G4cout
       << "Tangle2RunAction::EndOfRunAction: Master thread: "
-      << Tangle2::nMasterEvents   << " events, "
-      << Tangle2::nMasterEventsPh << " 511 keV deposit events"
       << G4endl;
+    
+    G4cout << Tangle2::nMasterEvents   << " events, "
+	   << Tangle2::nMasterEventsPh << " 511 keV deposit events"
+	   << G4endl;
   }
-  
+
   G4AnalysisManager* man = G4AnalysisManager::Instance();
   man->Write();
   man->CloseFile();

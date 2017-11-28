@@ -55,11 +55,8 @@ int main(int argc,char** argv)
   // Make your beam choices here
   Tangle2::positrons = false;
   Tangle2::fixedAxis = true;
-  Tangle2::perpPol   = false;
+  Tangle2::perpPol   = true;
  
-  // View the results?
-  G4bool useVisualiser = true;
-  
   runManager->SetUserInitialization(new Tangle2DetectorConstruction);
     
   G4int verbose;
@@ -84,7 +81,7 @@ int main(int argc,char** argv)
   G4cout << " ------------------------------------------ " << G4endl;
   G4cout << " QETlab simulation " << G4endl;
   G4cout <<  G4endl;
-  G4cout << " Generating : " << G4endl;
+  G4cout << " Generated : " << G4endl;
   
   // Print beam choices to screen
   if(Tangle2::positrons)
@@ -94,7 +91,7 @@ int main(int argc,char** argv)
     if(Tangle2::fixedAxis)
       G4cout << " On a fixed axis, " << G4endl;
     else
-      G4cout << " Isotropically, " << G4endl;
+      G4cout << " Covering detector area, " << G4endl;
     if(Tangle2::perpPol)
       G4cout << " with perpendicular polarisation. " << G4endl;
     else
@@ -102,8 +99,6 @@ int main(int argc,char** argv)
   }
   G4cout << " ------------------------------------------ " << G4endl;
   
-  // Visualiser
-  if(useVisualiser)
   ui->SessionStart();
   
   delete ui;

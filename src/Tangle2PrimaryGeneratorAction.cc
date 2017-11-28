@@ -13,6 +13,7 @@
 // *******************************************************************
 // $Id$
 // John Allison  22nd May 2017
+// Gary Smith    27th Nov 2017
 
 #include "Tangle2PrimaryGeneratorAction.hh"
 
@@ -37,37 +38,25 @@ Tangle2PrimaryGeneratorAction::Tangle2PrimaryGeneratorAction()
   fParticleGun(0)
 {
   G4int n_particle = 1;
-  //use a G4ParticleGun to generate either back to back photons or positrons
   fParticleGun  = new G4ParticleGun(n_particle);
-  
 }
 
 Tangle2PrimaryGeneratorAction::~Tangle2PrimaryGeneratorAction()
 {
-  delete fParticleGun;
-  
+  delete fParticleGun; 
 }
-
 
 void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4String particleName;
 
-  G4ParticleDefinition* particle1
-  = particleTable->FindParticle(particleName="gamma");
-
-  G4ParticleDefinition* particle2
-  = particleTable->FindParticle(particleName="e+");
-  
   // Use positrons or
   // back to back photons
   G4bool generatePositrons = false;
-  //
   if(Tangle2::positrons)
     generatePositrons = true;
 
-  
   // For back to back photons
   // a fixed axis beam can be chosen
   G4bool generateFixedAxis = false; // only use with (!generatePositrons)
@@ -87,12 +76,14 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     else 
       G4cout << " Invalid choice: positrons with perp pol  " << G4endl;
   }
-
+  
+  // vertex
+  G4double x0  = 0*cm, y0  = 0*cm, z0  = 0*cm;
+  
   //-----------------------Back to back photons------------------------ 
   if(!generatePositrons){
     
     G4double a = 10;
-    
     //Generate two random numbers between 1 and -1
     G4double b = (2*(( (G4double) rand() / (RAND_MAX)) - 0.5));
     G4double c = (2*(( (G4double) rand() / (RAND_MAX)) - 0.5));
@@ -102,55 +93,49 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       b = 0;
       c = 0;
     }
-    // random direction +/-8deg about x-axis
+    
+    // random direction +/- 8deg about x-axis
     // or x-axis (generateFixedAxis)
     G4ThreeVector x_axis = G4ThreeVector(a, b, c); 
     
-    // photon1
-    fParticleGun->SetParticleDefinition(particle1);
+    // Photon 1
+    fParticleGun->SetParticleDefinition(particleTable->FindParticle(particleName="gamma"));
     fParticleGun->SetParticleEnergy(511*keV);
     
-    G4double x0  = 0*cm, y0  = 0*cm, z0  = 0*cm;
     fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
     fParticleGun->SetParticleMomentumDirection(x_axis);
     
-    // Generate a random vector direction perpendicular to x_axis  
     G4ThreeVector random = G4RandomDirection();
     random = random.cross(x_axis);
-    
     fParticleGun->SetParticlePolarization(random);
     
-    // create vertex
     fParticleGun->GeneratePrimaryVertex(anEvent);
     
-    // photon 2
-    fParticleGun->SetParticleDefinition(particle1);
+    // Photon 2
     fParticleGun->SetParticleEnergy(511*keV);
     fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
     fParticleGun->SetParticleMomentumDirection(-x_axis);
-    
-    // Define vector direction perpenicular to photon1 polarisation  
     
     if(!generatePerpPol)
       random = G4RandomDirection().cross(x_axis);
     
     G4ThreeVector PerpPolarization = x_axis.cross(random);
-    
     fParticleGun->SetParticlePolarization(PerpPolarization);
         
+    fParticleGun->GeneratePrimaryVertex(anEvent);
+  } // end of: if(!generatePositrons){
+  else { // if (generatePositrons)
+    
+    fParticleGun->SetParticleDefinition(particleTable->FindParticle(particleName="e+"));
+    
+    // To do: investigate positron range
+    fParticleGun->SetParticleEnergy(0*keV);
+    
+    
+    fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
+    
     //create vertex
     fParticleGun->GeneratePrimaryVertex(anEvent);
-  }
-  if(generatePositrons){
-    //-------------------Positrons-------------------
-  
-  fParticleGun->SetParticleDefinition(particle2);
-  fParticleGun->SetParticleEnergy(0*keV);
-  G4double x0  = 0*cm, y0  = 0*cm, z0  = 0*cm;
-  fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
-
-  //create vertex
-  fParticleGun->GeneratePrimaryVertex(anEvent);
   }
   
 }
