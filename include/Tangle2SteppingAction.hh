@@ -44,6 +44,16 @@ private:
   
   G4bool doubleComptEvent = true;
 
+  // To Do:
+  // Investigate dphi calaulated
+  // using LOR between hits
+  
+  // G4ThreeVector LOR;  
+  
+  // G4ThreeVector LOR_A1B2;  
+  // G4ThreeVector LOR_A2B1;  
+  // G4ThreeVector LOR_A2B2;  
+  
   G4ThreeVector beam_A;  
   
   G4ThreeVector vScat_A1;

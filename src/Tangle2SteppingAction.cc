@@ -106,7 +106,7 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
 
   G4ThreeVector prePos  = preStepPoint->GetPosition();
   G4ThreeVector postPos = postStepPoint->GetPosition();
-
+  
   G4ThreeVector preMomentumDir  = preStepPoint->GetMomentumDirection();
   G4ThreeVector postMomentumDir = postStepPoint->GetMomentumDirection();
 
@@ -262,9 +262,7 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
 
     }
   }
-
   
-
   // Count the number of Compton scatters
   // occuring in each crystal
   G4int j = 0;
@@ -278,8 +276,20 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
        Tangle2::nb_Compt[j]++;
   }
   
-  if( nComptonA == 1 && 
-      nComptonB == 1){
+  if( nComptonA == 1  && 
+      nComptonB == 1 ){
+    
+    if(comments){
+      G4cout << G4endl;
+      G4cout << " beamA = (" << beam_A.getX() 
+	     <<          "," << beam_A.getY() 
+	     <<          "," << beam_A.getZ()
+	     <<         " )" << G4endl;
+      G4cout << " beamB = (" << beam_B.getX() 
+	     <<          "," << beam_B.getY() 
+	     <<          "," << beam_B.getZ()
+	     <<         " )" << G4endl;
+    }
     
     if(comments){
       G4cout << G4endl;

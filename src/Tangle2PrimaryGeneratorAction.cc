@@ -68,7 +68,7 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       G4cout << " Invalid choice: positrons with fixed axis " << G4endl;
   }
   
-  G4bool generatePerpPol = true;
+  G4bool generatePerpPol = false;
   
   if(Tangle2::perpPol){
     if(!generatePositrons) 
@@ -106,7 +106,9 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     fParticleGun->SetParticleMomentumDirection(x_axis);
     
     G4ThreeVector random = G4RandomDirection();
+    
     random = random.cross(x_axis);
+
     fParticleGun->SetParticlePolarization(random);
     
     fParticleGun->GeneratePrimaryVertex(anEvent);
@@ -120,6 +122,7 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       random = G4RandomDirection().cross(x_axis);
     
     G4ThreeVector PerpPolarization = x_axis.cross(random);
+    
     fParticleGun->SetParticlePolarization(PerpPolarization);
         
     fParticleGun->GeneratePrimaryVertex(anEvent);
