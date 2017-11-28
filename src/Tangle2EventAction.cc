@@ -59,11 +59,15 @@ void Tangle2EventAction::BeginOfEventAction(const G4Event*)
   Tangle2::thetaB = 0;
   Tangle2::phiA = 0;
   Tangle2::phiB = 0;
-  Tangle2::dphi = 0;
+  Tangle2::dphi = -99;
   Tangle2::thetaA2 = 500;
   Tangle2::thetaB2 = 500;
   Tangle2::phiA2 = 500;
   Tangle2::phiB2 = 500;
+  
+  Tangle2::dphiA1B2 = -99;
+  Tangle2::dphiA2B1 = -99;
+  Tangle2::dphiA2B2 = -99;
   
 }
 
@@ -136,6 +140,11 @@ void Tangle2EventAction::EndOfEventAction(const G4Event*)
     
     man->FillNtupleDColumn(57, Tangle2::thetaB2/radian);
     man->FillNtupleDColumn(58, Tangle2::phiB2/radian);
+    
+    man->FillNtupleDColumn(59, Tangle2::dphiA1B2/radian);
+    man->FillNtupleDColumn(60, Tangle2::dphiA2B1/radian);
+    man->FillNtupleDColumn(61, Tangle2::dphiA2B2/radian);
+    
     
     man->AddNtupleRow();
   }

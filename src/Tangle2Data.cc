@@ -31,3 +31,6 @@ G4ThreadLocal G4double Tangle2::thetaA2 = 0;
 G4ThreadLocal G4double Tangle2::thetaB2 = 0;
 G4ThreadLocal G4double Tangle2::phiA2 = 0;
 G4ThreadLocal G4double Tangle2::phiB2 = 0;
+G4ThreadLocal G4double Tangle2::dphiA1B2 = 0;
+G4ThreadLocal G4double Tangle2::dphiA2B1 = 0;
+G4ThreadLocal G4double Tangle2::dphiA2B2 = 0;

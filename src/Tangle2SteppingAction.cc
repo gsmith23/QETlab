@@ -278,7 +278,8 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
        Tangle2::nb_Compt[j]++;
   }
   
-  if( nComptonA == 1 && nComptonB == 1){
+  if( nComptonA == 1 && 
+      nComptonB == 1){
     
     if(comments){
       G4cout << G4endl;
@@ -293,6 +294,34 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
     
     if (Tangle2::dphi < 0){
       Tangle2::dphi = Tangle2::dphi + 360;}
+  
+  }
+  else if(nComptonA == 2 && 
+	  nComptonB == 1){
+    
+    Tangle2::dphiA2B1 = Tangle2::phiB + Tangle2::phiA2;
+    
+    if (Tangle2::dphiA2B1 < 0){
+      Tangle2::dphiA2B1 = Tangle2::dphiA2B1 + 360;}
+    
+  }
+  else if(nComptonA == 1 && 
+	  nComptonB == 2){
+  
+    Tangle2::dphiA1B2 = Tangle2::phiB2 + Tangle2::phiA;
+    
+    if (Tangle2::dphiA1B2 < 0){
+      Tangle2::dphiA1B2 = Tangle2::dphiA1B2 + 360;}
+    
+  }
+  else if(nComptonA == 2 && 
+	  nComptonB == 2){
+
+    Tangle2::dphiA2B2 = Tangle2::phiB2 + Tangle2::phiA2;
+    
+    if (Tangle2::dphiA2B2 < 0){
+      Tangle2::dphiA2B2 = Tangle2::dphiA2B2 + 360;}
+    
   }
   
   return;

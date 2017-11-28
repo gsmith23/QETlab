@@ -141,6 +141,10 @@ void Tangle2RunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("PhiA_2nd");
   analysisManager->CreateNtupleDColumn("ThetaB_2nd");
   analysisManager->CreateNtupleDColumn("PhiB_2nd");
+  
+  analysisManager->CreateNtupleDColumn("dPhi_A1B2");
+  analysisManager->CreateNtupleDColumn("dPhi_A2B1");
+  analysisManager->CreateNtupleDColumn("dPhi_A2B2");
    
   analysisManager->FinishNtuple();
   

@@ -4,6 +4,7 @@
 
 /run/initialize
 
+# visualiser
 #/vis/open OGL
 /vis/drawVolume
 
