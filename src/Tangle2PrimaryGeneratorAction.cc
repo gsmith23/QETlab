@@ -59,7 +59,7 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
   // For back to back photons
   // a fixed axis beam can be chosen
-  G4bool generateFixedAxis = false; // only use with (!generatePositrons)
+  G4bool generateFixedAxis = false; 
   
   if (Tangle2::fixedAxis){
     if(!generatePositrons)
@@ -70,6 +70,9 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   
   G4bool generatePerpPol = false;
   
+  // For back to back photons
+  // the relative polarisation
+  // can be orthogonal or random
   if(Tangle2::perpPol){
     if(!generatePositrons) 
       generatePerpPol = true;
@@ -89,7 +92,7 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     G4double c = (2*(( (G4double) rand() / (RAND_MAX)) - 0.5));
     
     if (generateFixedAxis){
-      a = 1;
+      a = -1;
       b = 0;
       c = 0;
     }

@@ -46,26 +46,35 @@ void Tangle2SteppingAction::EndOfEventAction()
 // To do - tidy up confusing variable names:
 
 // Define a function for calculating angles theta and phi
-void CalculateThetaPhi (const G4ThreeVector& v,
-			const G4ThreeVector& z_axis,
+void CalculateThetaPhi (const G4ThreeVector& vScat,
+			const G4ThreeVector& vBeam,
 			// Output quantities
-			G4ThreeVector& y_axis,
-			G4ThreeVector& x_axis,
-			G4double& cosTheta,
 			G4double& theta,
 			G4double& phi)
 {
-  cosTheta = v*z_axis;
+  G4double cosTheta = vScat*vBeam;
   theta = std::acos(cosTheta) * 180/(pi); //convert to degrees
-  // Make y' perpendicular to global z-axis.
-  y_axis = (z_axis.cross(G4ThreeVector(0,0,1))).unit();
-  x_axis = y_axis.cross(z_axis);
-  const G4ThreeVector ontoXYPlane = v.cross(z_axis);
-  // ontoXYPlane is a vector in the xy-plane, but perpendicular to the
-  // projection of the scattered photon, so
-  const G4double projection_x = -ontoXYPlane*y_axis;
-  const G4double projection_y = ontoXYPlane*x_axis;
-  phi = std::atan2(projection_y,projection_x) * 180/(pi); //convert to degrees
+  
+  // Redefine x,y,z in the frame of the beam
+  const G4ThreeVector z_axis = vBeam;
+  
+  G4ThreeVector arbitraryRef = G4ThreeVector(1,1,1).unit();
+
+  // in the unlikey event...
+  if( vBeam.unit() == arbitraryRef )
+    arbitraryRef = G4ThreeVector(0,1,1).unit();
+  
+  // Make new y perpendicular to new z-axis.
+  const G4ThreeVector y_axis = (z_axis.cross(arbitraryRef)).unit();
+  // Make new x perpendicular to z and y.
+  const G4ThreeVector x_axis = y_axis.cross(z_axis);
+  
+  const G4ThreeVector vScat_xy = vScat.cross(z_axis);
+  // vScat_xy is vector in xy-plane, perpendicular 
+  // to scattered photon projection
+  const G4double vScat_x = -vScat_xy*y_axis;
+  const G4double vScat_y = vScat_xy*x_axis;
+  phi = std::atan2(vScat_y,vScat_x) * 180/(pi);
 }
 
 void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
@@ -189,6 +198,7 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
     
     // first Compton in A
     if     (nComptonA == 0){ 
+      
       trackID_A1 = trackID;
       nComptonA  = 1;
       Tangle2::posA_1 = postPos; 
@@ -198,9 +208,6 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
       
       CalculateThetaPhi(vScat_A1,
 			beam_A,
-			y_axis_A1,
-			x_axis_A1,
-			cosTheta_A1,
 			Tangle2::thetaA,
 			Tangle2::phiA);
     }
@@ -215,12 +222,13 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
       
       CalculateThetaPhi(vScat_A2,
 			beam_A,
-			y_axis_A2,
-			x_axis_A2,
-			cosTheta_A2,
 			Tangle2::thetaA2,
 			Tangle2::phiA2);
       
+    }
+    else if(nComptonA == 2 &&
+	    trackID == trackID_A1){
+      nComptonA = 3;
     }
   }
   // array B is in negative x direction    
@@ -228,6 +236,7 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
     
     //  first Compton in B
     if     (nComptonB == 0){ 
+      
       trackID_B1 = trackID;
       nComptonB = 1;
       Tangle2::posB_1 = postPos;
@@ -237,9 +246,6 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
       
       CalculateThetaPhi(vScat_B1,
 			beam_B,
-			y_axis_B1,
-			x_axis_B1,
-			cosTheta_B1,
 			Tangle2::thetaB,
 			Tangle2::phiB);
     }
@@ -254,27 +260,19 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
       
       CalculateThetaPhi(vScat_B2,
 			beam_B,
-			y_axis_B2,
-			x_axis_B2,
-			cosTheta_B2,
 			Tangle2::thetaB2,
 			Tangle2::phiB2);
 
     }
-  }
+    else if(nComptonB == 2 &&
+	    trackID == trackID_B1){
+      nComptonB = 3;
+    }
+  }  
   
-  // Count the number of Compton scatters
+  // Iterate the number of Compton scatters
   // occuring in each crystal
-  G4int j = 0;
-  for (G4int i = 0; i < 9; i++){
-    
-    if(postPV->GetCopyNo()==i)
-      Tangle2::nb_Compt[i]++;
-    
-     j = i + 9;
-     if(postPV->GetCopyNo()==j)
-       Tangle2::nb_Compt[j]++;
-  }
+  Tangle2::nb_Compt[postPV->GetCopyNo()]++;
   
   if( nComptonA == 1  && 
       nComptonB == 1 ){
@@ -302,8 +300,10 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
     
     Tangle2::dphi = Tangle2::phiB + Tangle2::phiA;
     
-    if (Tangle2::dphi < 0){
-      Tangle2::dphi = Tangle2::dphi + 360;}
+    if (Tangle2::dphi < 0)
+      Tangle2::dphi = Tangle2::dphi + 360;
+    
+    Tangle2::nA1B1++;
   
   }
   else if(nComptonA == 2 && 
@@ -311,8 +311,10 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
     
     Tangle2::dphiA2B1 = Tangle2::phiB + Tangle2::phiA2;
     
-    if (Tangle2::dphiA2B1 < 0){
-      Tangle2::dphiA2B1 = Tangle2::dphiA2B1 + 360;}
+    if (Tangle2::dphiA2B1 < 0)
+      Tangle2::dphiA2B1 = Tangle2::dphiA2B1 + 360;
+    
+    Tangle2::nA2B1++;
     
   }
   else if(nComptonA == 1 && 
@@ -320,18 +322,20 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
   
     Tangle2::dphiA1B2 = Tangle2::phiB2 + Tangle2::phiA;
     
-    if (Tangle2::dphiA1B2 < 0){
-      Tangle2::dphiA1B2 = Tangle2::dphiA1B2 + 360;}
+    if (Tangle2::dphiA1B2 < 0)
+      Tangle2::dphiA1B2 = Tangle2::dphiA1B2 + 360;
     
+    Tangle2::nA1B2++;
   }
   else if(nComptonA == 2 && 
 	  nComptonB == 2){
 
     Tangle2::dphiA2B2 = Tangle2::phiB2 + Tangle2::phiA2;
     
-    if (Tangle2::dphiA2B2 < 0){
-      Tangle2::dphiA2B2 = Tangle2::dphiA2B2 + 360;}
+    if (Tangle2::dphiA2B2 < 0)
+      Tangle2::dphiA2B2 = Tangle2::dphiA2B2 + 360;
     
+    Tangle2::nA2B2++;
   }
   
   return;
