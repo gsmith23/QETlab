@@ -190,7 +190,14 @@ void Tangle2RunAction::EndOfRunAction(const G4Run* run)
 	   << Tangle2::nMasterEventsPh << " 511 keV deposit events"
 	   << G4endl;
   }
-
+  
+  //   G4cout << G4endl;
+  //   G4cout << " nA1B1 = " << Tangle2::nA1B1 << G4endl;
+  //   G4cout << " nA1B2 = " << Tangle2::nA1B2 << G4endl;
+  //   G4cout << " nA2B1 = " << Tangle2::nA2B1 << G4endl;
+  //   G4cout << " nA2B2 = " << Tangle2::nA2B2 << G4endl;
+  //   G4cout << G4endl;
+  
   G4AnalysisManager* man = G4AnalysisManager::Instance();
   man->Write();
   man->CloseFile();

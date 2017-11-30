@@ -92,7 +92,7 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     G4double c = (2*(( (G4double) rand() / (RAND_MAX)) - 0.5));
     
     if (generateFixedAxis){
-      a = -1;
+      a = 1;
       b = 0;
       c = 0;
     }

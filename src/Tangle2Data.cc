@@ -35,6 +35,11 @@ G4ThreadLocal G4double Tangle2::dphiA1B2 = 0;
 G4ThreadLocal G4double Tangle2::dphiA2B1 = 0;
 G4ThreadLocal G4double Tangle2::dphiA2B2 = 0;
 
+// create new dphis where the LOR for scattered 
+// events is used for the 'beam' ie pretent that 
+// scattering is not known about:
+// dphiA1B2_S e.g.
+
 G4ThreadLocal G4int Tangle2::nA1B1 = 0;
 G4ThreadLocal G4int Tangle2::nA2B1 = 0;
 G4ThreadLocal G4int Tangle2::nA1B2 = 0;

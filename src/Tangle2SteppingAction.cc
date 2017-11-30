@@ -32,20 +32,111 @@
 #include <vector>
 
 Tangle2SteppingAction::Tangle2SteppingAction
-(Tangle2RunAction* runAction)
-{}
+(Tangle2RunAction* runAction){}
+
 
 void Tangle2SteppingAction::BeginOfEventAction()
 {
+  const G4Event* evt = G4RunManager::GetRunManager()->GetCurrentEvent();
+  if(evt) eventID = evt->GetEventID();
+  
+  if(eventID!=previousEventID){
+    previousEventID = eventID;
+    
+    if(comments){
+      G4cout << G4endl;
+      G4cout << " Event " << eventID << G4endl;
+    }
+    
+    for (int i = 0 ; i < 18 ; i++)
+      Tangle2::nb_Compt[i]=0; 
+    
+    nComptonA     = 0;
+    nComptonB     = 0;
+    
+    trackID_A1 = -1;
+    trackID_B1 = -1;
+    
+    // this boolean is used to skip angle calculations
+    // for events without Compt for both gammas
+    doubleComptEvent = true;
+    
+  }
+ 
 }
+
 
 void Tangle2SteppingAction::EndOfEventAction()
 {
+  if( nComptonA >= 1  && 
+      nComptonB >= 1 ){
+    
+    if(comments){
+      G4cout << G4endl;
+      G4cout << " beam_A = (" << beam_A.getX() 
+	     <<           "," << beam_A.getY() 
+	     <<           "," << beam_A.getZ()
+	     <<          " )" << G4endl;
+      G4cout << " beam_B = (" << beam_B.getX() 
+	     <<           "," << beam_B.getY() 
+	     <<           "," << beam_B.getZ()
+	     <<          " )" << G4endl;
+    }
+    
+    if(comments){
+      G4cout << G4endl;
+      G4cout << " --------------------------- " << G4endl;
+      G4cout << " Event " << eventID            << G4endl;
+      G4cout << " Had Compt for both gammas   " << G4endl;
+      G4cout << " --------------------------- " << G4endl;
+      G4cout << G4endl;
+    }
+    
+    Tangle2::dphi = Tangle2::phiB + Tangle2::phiA;
+    
+    if (Tangle2::dphi < 0)
+      Tangle2::dphi = Tangle2::dphi + 360;
+    
+    Tangle2::nA1B1++;
+  
+  }
+  
+  if(nComptonA >= 2 && 
+     nComptonB >= 1){
+    
+    Tangle2::dphiA2B1 = Tangle2::phiB + Tangle2::phiA2;
+    
+    if (Tangle2::dphiA2B1 < 0)
+      Tangle2::dphiA2B1 = Tangle2::dphiA2B1 + 360;
+    
+    Tangle2::nA2B1++;
+    
+  }
+  
+  if(nComptonA >= 1 && 
+     nComptonB >= 2){
+  
+    Tangle2::dphiA1B2 = Tangle2::phiB2 + Tangle2::phiA;
+    
+    if (Tangle2::dphiA1B2 < 0)
+      Tangle2::dphiA1B2 = Tangle2::dphiA1B2 + 360;
+    
+    Tangle2::nA1B2++;
+  }
+  
+  if(nComptonA >= 2 && 
+     nComptonB >= 2){
+
+    Tangle2::dphiA2B2 = Tangle2::phiB2 + Tangle2::phiA2;
+    
+    if (Tangle2::dphiA2B2 < 0)
+      Tangle2::dphiA2B2 = Tangle2::dphiA2B2 + 360;
+    
+    Tangle2::nA2B2++;
+  }
+
 }
 
-// To do - tidy up confusing variable names:
-
-// Define a function for calculating angles theta and phi
 void CalculateThetaPhi (const G4ThreeVector& vScat,
 			const G4ThreeVector& vBeam,
 			// Output quantities
@@ -80,30 +171,6 @@ void CalculateThetaPhi (const G4ThreeVector& vScat,
 void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
 {
   
-  // Determine if this step is for a new event
-  // and if so initialise compton scattering 
-  // counting variables
-  const G4Event* evt = G4RunManager::GetRunManager()->GetCurrentEvent();
-  if(evt) eventID = evt->GetEventID();
-  
-  if(eventID!=previousEventID){
-    previousEventID = eventID;
-    
-    for (int i = 0 ; i < 18 ; i++)
-      Tangle2::nb_Compt[i]=0; 
-    
-    nComptonA     = 0;
-    nComptonB     = 0;
-    fstCompStep_A = 0;
-    sndCompStep_A = 0;
-    fstCompStep_B = 0;
-    sndCompStep_B = 0;
-    
-    // this boolean is used to skip angle calculations
-    // for events without Compt for both gammas
-    doubleComptEvent = true;
-    
-  }
   
   G4StepPoint* preStepPoint  = step->GetPreStepPoint();
   G4StepPoint* postStepPoint = step->GetPostStepPoint();
@@ -118,7 +185,11 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
   
   G4ThreeVector preMomentumDir  = preStepPoint->GetMomentumDirection();
   G4ThreeVector postMomentumDir = postStepPoint->GetMomentumDirection();
-
+  
+  G4ThreeVector preStepPol  = preStepPoint->GetPolarization(); 
+  G4ThreeVector postStepPol = postStepPoint->GetPolarization(); 
+  
+  
   G4Track* track = step->GetTrack();
   
   G4int    stepNumber   = track->GetCurrentStepNumber();
@@ -150,19 +221,8 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
     Tangle2::eDepColl2 +=eDep;}
   */
   
-  if(comments){
-    G4cout << G4endl;
-    G4cout << " particleName = " << particleName << G4endl;
-    G4cout << " processName  = " << processName  << G4endl;
-    G4cout << " trackID      = " << trackID      << G4endl;
-    G4cout << " stepNumber   = " << stepNumber   << G4endl;
-  }
-  
-  G4int fstGammaTrackID = 2;
-  G4int sndGammaTrackID = 1;
   
   if(Tangle2::positrons){
-    fstGammaTrackID = 3;
     sndGammaTrackID = 2;
   }
   
@@ -185,13 +245,13 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
   }
     
   //-------------------------
-  // From here we are now only 
-  // interested in both photons 
-  // Compton scattering. 
+  // From here on only gammas 
+  // Compton scattering may pass. 
   
   if( (particleName != "gamma") || 
       (processName  != "compt") ) 
     return;
+  
   
   // array A is in positive x direction
   if     ( postPos[0] > 0) {
@@ -266,77 +326,28 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
     }
     else if(nComptonB == 2 &&
 	    trackID == trackID_B1){
-      nComptonB = 3;
+      nComptonB = 3; 
     }
   }  
+  
+  if(comments){
+    G4cout << G4endl;
+    G4cout << " particleName = " << particleName << G4endl;
+    G4cout << " processName  = " << processName  << G4endl;
+    G4cout << " trackID      = " << trackID      << G4endl;
+    G4cout << " stepNumber   = " << stepNumber   << G4endl;
+    G4cout << G4endl;    
+    G4cout << " nComptonA    = " << nComptonA   << G4endl;
+    G4cout << " nComptonB    = " << nComptonB   << G4endl;
+    G4cout << " trackID_A1   = " << trackID_A1  << G4endl;
+    G4cout << " trackID_B1   = " << trackID_B1  << G4endl;
+  }
+
   
   // Iterate the number of Compton scatters
   // occuring in each crystal
   Tangle2::nb_Compt[postPV->GetCopyNo()]++;
   
-  if( nComptonA == 1  && 
-      nComptonB == 1 ){
-    
-    if(comments){
-      G4cout << G4endl;
-      G4cout << " beamA = (" << beam_A.getX() 
-	     <<          "," << beam_A.getY() 
-	     <<          "," << beam_A.getZ()
-	     <<         " )" << G4endl;
-      G4cout << " beamB = (" << beam_B.getX() 
-	     <<          "," << beam_B.getY() 
-	     <<          "," << beam_B.getZ()
-	     <<         " )" << G4endl;
-    }
-    
-    if(comments){
-      G4cout << G4endl;
-      G4cout << " --------------------------- " << G4endl;
-      G4cout << " Event " << eventID << G4endl;
-      G4cout << " Had Compt for both gammas "  << G4endl;
-      G4cout << " --------------------------- " << G4endl;
-      G4cout << G4endl;
-    }
-    
-    Tangle2::dphi = Tangle2::phiB + Tangle2::phiA;
-    
-    if (Tangle2::dphi < 0)
-      Tangle2::dphi = Tangle2::dphi + 360;
-    
-    Tangle2::nA1B1++;
-  
-  }
-  else if(nComptonA == 2 && 
-	  nComptonB == 1){
-    
-    Tangle2::dphiA2B1 = Tangle2::phiB + Tangle2::phiA2;
-    
-    if (Tangle2::dphiA2B1 < 0)
-      Tangle2::dphiA2B1 = Tangle2::dphiA2B1 + 360;
-    
-    Tangle2::nA2B1++;
-    
-  }
-  else if(nComptonA == 1 && 
-	  nComptonB == 2){
-  
-    Tangle2::dphiA1B2 = Tangle2::phiB2 + Tangle2::phiA;
-    
-    if (Tangle2::dphiA1B2 < 0)
-      Tangle2::dphiA1B2 = Tangle2::dphiA1B2 + 360;
-    
-    Tangle2::nA1B2++;
-  }
-  else if(nComptonA == 2 && 
-	  nComptonB == 2){
-
-    Tangle2::dphiA2B2 = Tangle2::phiB2 + Tangle2::phiA2;
-    
-    if (Tangle2::dphiA2B2 < 0)
-      Tangle2::dphiA2B2 = Tangle2::dphiA2B2 + 360;
-    
-    Tangle2::nA2B2++;
-  }
   
   return;
 }

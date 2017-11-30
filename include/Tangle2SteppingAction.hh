@@ -31,19 +31,18 @@ public:
   virtual void EndOfEventAction();
 
 private:
-  Tangle2RunAction* fpRunAction;
+  //Tangle2RunAction* fpRunAction;
   
-  G4int nComptonA,     nComptonB;
-  G4int fstCompStep_A, sndCompStep_A;
-  G4int fstCompStep_B, sndCompStep_B;
-  
+  G4int nComptonA, nComptonB;
   G4int trackID_A1, trackID_B1;
 
   G4int previousEventID = -1;
   G4int eventID         = 0;
   
   G4bool doubleComptEvent = true;
-
+  
+  G4int sndGammaTrackID = 1;
+  
   // To Do:
   // Investigate dphi calaulated
   // using LOR between hits
@@ -63,8 +62,7 @@ private:
   G4ThreeVector vScat_B2;  
 
   G4bool comments = false;
-  
-  
+
 };
 
 #endif

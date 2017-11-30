@@ -55,7 +55,7 @@ int main(int argc,char** argv)
   // Make your beam choices here
   Tangle2::positrons = false;
   Tangle2::fixedAxis = true;
-  Tangle2::perpPol   = false;
+  Tangle2::perpPol   = true;
  
   runManager->SetUserInitialization(new Tangle2DetectorConstruction);
     
