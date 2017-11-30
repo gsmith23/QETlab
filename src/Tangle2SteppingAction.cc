@@ -342,12 +342,10 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
     G4cout << " trackID_A1   = " << trackID_A1  << G4endl;
     G4cout << " trackID_B1   = " << trackID_B1  << G4endl;
   }
-
   
   // Iterate the number of Compton scatters
   // occuring in each crystal
   Tangle2::nb_Compt[postPV->GetCopyNo()]++;
-  
   
   return;
 }
