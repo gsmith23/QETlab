@@ -1,6 +1,6 @@
 /control/verbose 2
 
-#/run/numberOfThreads 8
+/run/numberOfThreads 8
 
 /run/initialize
 
@@ -10,13 +10,13 @@
 
 /control/execute pretty.mac
 
-/run/beamOn 5
+#/run/beamOn 5
 
 # 2 Million
 #/run/beamOn 2000000
 
 # 2 Billion
-#/run/beamOn 2000000000
+/run/beamOn 2000000000
 
 
 
