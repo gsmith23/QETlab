@@ -22,7 +22,7 @@
 #endif
 #include "G4PhysListFactory.hh"
 #include "Tangle2DetectorConstruction.hh"
-//#include "G4EmLivermorePolarizedPhysics.hh"
+#include "G4EmLivermorePolarizedPhysics.hh"
 #include "G4EmLivermorePhysics.hh"
 #include "Tangle2ActionInitialization.hh"
 #include "G4UIExecutive.hh"
@@ -36,6 +36,10 @@ int main(int argc,char** argv)
   
   // Graphics?
   G4bool  useGraphics = false;
+  
+  // Turn on/off polarised Compton
+  G4bool  usePolarisedCompton = true;
+  
   // Make your beam choices here
   Tangle2::positrons = true;
   Tangle2::fixedAxis = false;
@@ -71,8 +75,10 @@ int main(int argc,char** argv)
   G4VModularPhysicsList* physList = factory.GetReferencePhysList("FTFP_BERT");
   physList->SetVerboseLevel(verbose = 1);
   
-  //physList->ReplacePhysics(new G4EmLivermorePolarizedPhysics);
-  physList->ReplacePhysics(new G4EmLivermorePhysics); 
+  if(usePolarisedCompton)
+    physList->ReplacePhysics(new G4EmLivermorePolarizedPhysics);
+  else
+    physList->ReplacePhysics(new G4EmLivermorePhysics); 
 
   runManager->SetUserInitialization(physList);
 
@@ -107,6 +113,11 @@ int main(int argc,char** argv)
     else
       G4cout << " with random relative polarisation. " << G4endl;
   }
+  if(usePolarisedCompton)
+    G4cout << " Polarized Compton scattering " << G4endl;
+  else
+    G4cout << " UnPolarized Compton scattering " << G4endl;
+     
   G4cout << " ------------------------------------------ " << G4endl;
   
      if(useGraphics)
