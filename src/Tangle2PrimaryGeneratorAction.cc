@@ -137,7 +137,6 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     // To do: investigate positron range
     fParticleGun->SetParticleEnergy(0*keV);
     
-    
     fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
     
     //create vertex

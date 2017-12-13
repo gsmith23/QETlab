@@ -46,7 +46,7 @@ int main(int argc,char** argv)
   Tangle2::perpPol   = true;
   
   // Do this first to capture all output
-  G4UIExecutive* ui;
+  G4UIExecutive* ui = nullptr;
   
   if(useGraphics)
     ui = new G4UIExecutive(argc, argv);

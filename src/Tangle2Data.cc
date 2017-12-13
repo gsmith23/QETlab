@@ -1,7 +1,5 @@
 #include "Tangle2Data.hh"
 
-// change to false to run with 
-// back to back photons
 G4bool Tangle2::positrons = false;
 G4bool Tangle2::fixedAxis = false;
 G4bool Tangle2::perpPol   = false;

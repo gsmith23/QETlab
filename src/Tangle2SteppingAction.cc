@@ -137,13 +137,15 @@ void Tangle2SteppingAction::EndOfEventAction()
 
 }
 
-void CalculateThetaPhi (const G4ThreeVector& vScat,
-			const G4ThreeVector& vBeam,
+void CalculateThetaPhi (const G4ThreeVector& vBeam,
+			const G4ThreeVector& vPre,
+			const G4ThreeVector& vScat,
 			// Output quantities
 			G4double& theta,
 			G4double& phi)
 {
-  G4double cosTheta = vScat*vBeam;
+  
+  G4double cosTheta = vScat*vPre;
   theta = std::acos(cosTheta) * 180/(pi); //convert to degrees
   
   // Redefine x,y,z in the frame of the beam
@@ -266,8 +268,9 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
       beam_A   = preMomentumDir;
       vScat_A1 = postMomentumDir;
       
-      CalculateThetaPhi(vScat_A1,
+      CalculateThetaPhi(beam_A,
 			beam_A,
+			vScat_A1,
 			Tangle2::thetaA,
 			Tangle2::phiA);
     }
@@ -280,8 +283,9 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
       
       vScat_A2 = postMomentumDir;  
       
-      CalculateThetaPhi(vScat_A2,
-			beam_A,
+      CalculateThetaPhi(beam_A,
+			preMomentumDir,
+			vScat_A2,
 			Tangle2::thetaA2,
 			Tangle2::phiA2);
       
@@ -304,8 +308,9 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
       beam_B   = preMomentumDir;
       vScat_B1 = postMomentumDir;
       
-      CalculateThetaPhi(vScat_B1,
+      CalculateThetaPhi(beam_B,
 			beam_B,
+			vScat_B1,
 			Tangle2::thetaB,
 			Tangle2::phiB);
     }
@@ -318,8 +323,9 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
       
       vScat_B2 = postMomentumDir;  
       
-      CalculateThetaPhi(vScat_B2,
-			beam_B,
+      CalculateThetaPhi(beam_B,
+			preMomentumDir,
+			vScat_B2,
 			Tangle2::thetaB2,
 			Tangle2::phiB2);
 

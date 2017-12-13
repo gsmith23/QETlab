@@ -85,11 +85,11 @@ void Tangle2RunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("edep14");
   analysisManager->CreateNtupleDColumn("edep15");
   analysisManager->CreateNtupleDColumn("edep16");
-  analysisManager->CreateNtupleDColumn("edep17");
+  analysisManager->CreateNtupleDColumn("edep17"); 
 
   //energy deposited in collimator 
   analysisManager->CreateNtupleDColumn("edepColl1");
-  analysisManager->CreateNtupleDColumn("edepColl2");
+  analysisManager->CreateNtupleDColumn("edepColl2"); // 20
 
   //number of Compton scattering processes in each crystal
   analysisManager->CreateNtupleIColumn("nb_Compt0");
@@ -110,7 +110,7 @@ void Tangle2RunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleIColumn("nb_Compt14");
   analysisManager->CreateNtupleIColumn("nb_Compt15");
   analysisManager->CreateNtupleIColumn("nb_Compt16");
-  analysisManager->CreateNtupleIColumn("nb_Compt17");
+  analysisManager->CreateNtupleIColumn("nb_Compt17"); // 38
 
   //position of first Compton in A
   analysisManager->CreateNtupleDColumn("XposA_1st");
