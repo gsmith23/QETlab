@@ -40,8 +40,10 @@ private:
   G4int eventID         = 0;
   
   G4bool doubleComptEvent = true;
-  
-  G4int sndGammaTrackID = 1;
+
+  // gamma track IDs are different for
+  // back to back and positron sources 
+  G4int sndGammaTrackID = 1; // first track is 2
   
   // To Do:
   // Investigate dphi calaulated

@@ -5,11 +5,11 @@
 /run/initialize
 
 # 2 Million
-#/run/beamOn 2000000
+/run/beamOn 2000000
 
 # 20 Million
 #/run/beamOn 20000000
 
 # 2 Billion
-/run/beamOn 2000000000
+#/run/beamOn 2000000000
 
