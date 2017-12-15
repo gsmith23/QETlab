@@ -41,9 +41,9 @@ int main(int argc,char** argv)
   G4bool  usePolarisedCompton = true;
   
   // Make your beam choices here
-  Tangle2::positrons = false;
+  Tangle2::positrons = true;
   Tangle2::fixedAxis = false;
-  Tangle2::perpPol   = true;
+  Tangle2::perpPol   = false;
   
   // Do this first to capture all output
   G4UIExecutive* ui = nullptr;
