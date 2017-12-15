@@ -39,6 +39,10 @@ void Tangle2SteppingAction::BeginOfEventAction()
 {
   const G4Event* evt = G4RunManager::GetRunManager()->GetCurrentEvent();
   if(evt) eventID = evt->GetEventID();
+
+  if(Tangle2::positrons){
+    sndGammaTrackID = 2; // first track is 3
+  }
   
   if(eventID!=previousEventID){
     previousEventID = eventID;
@@ -173,7 +177,6 @@ void CalculateThetaPhi (const G4ThreeVector& vBeam,
 void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
 {
   
-  
   G4StepPoint* preStepPoint  = step->GetPreStepPoint();
   G4StepPoint* postStepPoint = step->GetPostStepPoint();
   
@@ -190,7 +193,6 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
   
   G4ThreeVector preStepPol  = preStepPoint->GetPolarization(); 
   G4ThreeVector postStepPol = postStepPoint->GetPolarization(); 
-  
   
   G4Track* track = step->GetTrack();
   
@@ -209,24 +211,21 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
   // for any processes
   if ( (postPV)   && 
        (eDep > 0) && 
-       (postPV->GetName() != "disc")       &&
+       (postPV->GetName() != "disc") &&
        (postPV->GetName() != "Coll_right") &&
        (postPV->GetName() != "Coll_left"))
     {
-      Tangle2::eDepCryst[postPV->GetCopyNo()] += eDep;
+	Tangle2::eDepCryst[postPV->GetCopyNo()] += eDep;
     }
   
+
+
   //Fill Collimator energy depositions
   /* if((postPV->GetCopyNo()==18) && (eDep>0)){
     Tangle2::eDepColl1 +=eDep;}
   if((postPV->GetCopyNo()==19) && (eDep>0)){
     Tangle2::eDepColl2 +=eDep;}
   */
-  
-  
-  if(Tangle2::positrons){
-    sndGammaTrackID = 2;
-  }
   
   // If there was no Compton scattering for the 
   // first track then delta phi cant be calculated
@@ -254,6 +253,8 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
       (processName  != "compt") ) 
     return;
   
+  G4double cosThetaPol = preStepPol*postStepPol;
+  G4double thetaPol    = std::acos(cosThetaPol) * 180/(pi); 
   
   // array A is in positive x direction
   if     ( postPos[0] > 0) {
@@ -273,6 +274,15 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
 			vScat_A1,
 			Tangle2::thetaA,
 			Tangle2::phiA);
+  
+
+//       G4cout << G4endl;
+//       G4cout << " beam_A.phi()    = " << beam_A.phi()*180/pi   << G4endl;
+//       G4cout << " vScat_A1.phi()  = " << vScat_A1.phi()*180/pi << G4endl;
+//       G4cout << " Tangle2::thetaA = " << Tangle2::thetaA       << G4endl;
+//       G4cout << " Tangle2::phiA   = " << Tangle2::phiA         << G4endl;
+//       G4cout << " thetaPol        = " << thetaPol              << G4endl;
+      
     }
     // second Compton in A
     else if(nComptonA == 1 &&
@@ -313,6 +323,13 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
 			vScat_B1,
 			Tangle2::thetaB,
 			Tangle2::phiB);
+//       G4cout << G4endl;
+//       G4cout << " beam_B.phi()    = " << beam_B.phi()*180/pi   << G4endl;
+//       G4cout << " vScat_B1.phi()  = " << vScat_B1.phi()*180/pi << G4endl;
+//       G4cout << " Tangle2::thetaB = " << Tangle2::thetaB       << G4endl;
+//       G4cout << " Tangle2::phiB   = " << Tangle2::phiB         << G4endl;
+//       G4cout << " thetaPol        = " << thetaPol              << G4endl;
+    
     }
     // second Compton in B
     else if(nComptonB == 1 &&

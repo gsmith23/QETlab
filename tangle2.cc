@@ -42,9 +42,10 @@ int main(int argc,char** argv)
   
   // Make your beam choices here
   Tangle2::positrons = false;
-  Tangle2::fixedAxis = false;
+  Tangle2::fixedAxis = true;
   Tangle2::perpPol   = true;
-  
+  Tangle2::polYZ     = true;
+
   // Do this first to capture all output
   G4UIExecutive* ui = nullptr;
   
