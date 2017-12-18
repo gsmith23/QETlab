@@ -5,11 +5,11 @@
 /run/initialize
 
 # visualiser
-/vis/open OGL
+#/vis/open OGL
 /vis/drawVolume
 
 /control/execute pretty.mac
-/random/setSeeds 4 30
+
 
 #/run/beamOn 5
 

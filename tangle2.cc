@@ -53,8 +53,8 @@ int main(int argc,char** argv)
 #endif
   
   // Make your beam choices here
-  Tangle2::positrons = false;
-  Tangle2::fixedAxis = true;
+  Tangle2::positrons = true;
+  Tangle2::fixedAxis = false;
   Tangle2::perpPol   = false;
  
   runManager->SetUserInitialization(new Tangle2DetectorConstruction);
@@ -99,7 +99,7 @@ int main(int argc,char** argv)
   }
   G4cout << " ------------------------------------------ " << G4endl;
   
-  ui->SessionStart();
+  //   ui->SessionStart();
   
   delete ui;
   delete visManager;

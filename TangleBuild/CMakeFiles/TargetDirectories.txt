@@ -1,0 +1,2 @@
+/home/s1321516/MPhysProject/QETlab/TangleBuild/CMakeFiles/tangle2.dir
+/home/s1321516/MPhysProject/QETlab/TangleBuild/CMakeFiles/tangle2_exec.dir
