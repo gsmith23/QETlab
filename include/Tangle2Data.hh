@@ -19,6 +19,7 @@ namespace Tangle2 {
   extern G4bool positrons;
   extern G4bool fixedAxis;
   extern G4bool perpPol;
+  extern G4bool polYZ;
   
   extern G4int nMasterEvents;
   extern G4int nMasterEventsPh;  
@@ -49,6 +50,11 @@ namespace Tangle2 {
   extern G4ThreadLocal G4double dphiA2B1;
   extern G4ThreadLocal G4double dphiA2B2;
 
+  extern G4ThreadLocal G4int nA1B1;
+  extern G4ThreadLocal G4int nA2B1;
+  extern G4ThreadLocal G4int nA1B2;
+  extern G4ThreadLocal G4int nA2B2;
+  
 }
 
 #endif

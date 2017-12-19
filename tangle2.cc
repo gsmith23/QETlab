@@ -23,7 +23,7 @@
 #include "G4PhysListFactory.hh"
 #include "Tangle2DetectorConstruction.hh"
 #include "G4EmLivermorePolarizedPhysics.hh"
-//#include "G4EmLivermorePhysics.hh"
+#include "G4EmLivermorePhysics.hh"
 #include "Tangle2ActionInitialization.hh"
 #include "G4UIExecutive.hh"
 #include "G4UImanager.hh"
@@ -33,8 +33,24 @@
 
 int main(int argc,char** argv)
 {
+  
+  // Graphics?
+  G4bool  useGraphics = false;
+  
+  // Turn on/off polarised Compton
+  G4bool  usePolarisedCompton = true;
+  
+  // Make your beam choices here
+  Tangle2::positrons = false;
+  Tangle2::fixedAxis = true;
+  Tangle2::perpPol   = true;
+  Tangle2::polYZ     = false;
+
   // Do this first to capture all output
-  G4UIExecutive* ui = new G4UIExecutive(argc, argv);
+  G4UIExecutive* ui = nullptr;
+  
+  if(useGraphics)
+    ui = new G4UIExecutive(argc, argv);
   
   // Choose the Random engine
   G4Random::setTheEngine(new CLHEP::RanecuEngine);
@@ -51,11 +67,6 @@ int main(int argc,char** argv)
 #else
   G4RunManager* runManager = new G4RunManager;
 #endif
-  
-  // Make your beam choices here
-  Tangle2::positrons = true;
-  Tangle2::fixedAxis = false;
-  Tangle2::perpPol   = false;
  
   runManager->SetUserInitialization(new Tangle2DetectorConstruction);
     
@@ -65,8 +76,10 @@ int main(int argc,char** argv)
   G4VModularPhysicsList* physList = factory.GetReferencePhysList("FTFP_BERT");
   physList->SetVerboseLevel(verbose = 1);
   
-  physList->ReplacePhysics(new G4EmLivermorePolarizedPhysics);
-  // physList->ReplacePhysics(new G4EmLivermorePhysics); 
+  if(usePolarisedCompton)
+    physList->ReplacePhysics(new G4EmLivermorePolarizedPhysics);
+  else
+    physList->ReplacePhysics(new G4EmLivermorePhysics); 
 
   runManager->SetUserInitialization(physList);
 
@@ -76,8 +89,12 @@ int main(int argc,char** argv)
   visManager->Initialize();
 
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
-  UImanager->ApplyCommand("/control/execute vis.mac");
-
+  
+  if(useGraphics)
+    UImanager->ApplyCommand("/control/execute visGraph.mac");
+  else
+    UImanager->ApplyCommand("/control/execute visNoGraph.mac");
+  
   G4cout << " ------------------------------------------ " << G4endl;
   G4cout << " QETlab simulation " << G4endl;
   G4cout <<  G4endl;
@@ -97,9 +114,15 @@ int main(int argc,char** argv)
     else
       G4cout << " with random relative polarisation. " << G4endl;
   }
+  if(usePolarisedCompton)
+    G4cout << " Polarized Compton scattering " << G4endl;
+  else
+    G4cout << " UnPolarized Compton scattering " << G4endl;
+     
   G4cout << " ------------------------------------------ " << G4endl;
   
-  //   ui->SessionStart();
+     if(useGraphics)
+       ui->SessionStart();
   
   delete ui;
   delete visManager;

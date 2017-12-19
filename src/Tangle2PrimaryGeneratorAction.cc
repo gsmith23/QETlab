@@ -56,10 +56,10 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   G4bool generatePositrons = false;
   if(Tangle2::positrons)
     generatePositrons = true;
-
+  
   // For back to back photons
   // a fixed axis beam can be chosen
-  G4bool generateFixedAxis = false; // only use with (!generatePositrons)
+  G4bool generateFixedAxis = false; 
   
   if (Tangle2::fixedAxis){
     if(!generatePositrons)
@@ -70,12 +70,20 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   
   G4bool generatePerpPol = false;
   
+  // For back to back photons
+  // the relative polarisation
+  // can be orthogonal or random
   if(Tangle2::perpPol){
     if(!generatePositrons) 
       generatePerpPol = true;
     else 
       G4cout << " Invalid choice: positrons with perp pol  " << G4endl;
   }
+  
+  G4bool generatePolYZ = false;
+  
+  if(Tangle2::polYZ)
+    generatePolYZ = true;
   
   // vertex
   G4double x0  = 0*cm, y0  = 0*cm, z0  = 0*cm;
@@ -108,8 +116,11 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     G4ThreeVector random = G4RandomDirection();
     
     random = random.cross(x_axis);
-
-    fParticleGun->SetParticlePolarization(random);
+    
+    if(generatePolYZ)
+      fParticleGun->SetParticlePolarization(G4ThreeVector(0,1,0));
+    else
+      fParticleGun->SetParticlePolarization(random);
     
     fParticleGun->GeneratePrimaryVertex(anEvent);
     
@@ -123,7 +134,10 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     
     G4ThreeVector PerpPolarization = x_axis.cross(random);
     
-    fParticleGun->SetParticlePolarization(PerpPolarization);
+    if(generatePolYZ)
+      fParticleGun->SetParticlePolarization(G4ThreeVector(0,0,1));
+    else
+      fParticleGun->SetParticlePolarization(PerpPolarization);
         
     fParticleGun->GeneratePrimaryVertex(anEvent);
   } // end of: if(!generatePositrons){
@@ -133,7 +147,6 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     
     // To do: investigate positron range
     fParticleGun->SetParticleEnergy(0*keV);
-    
     
     fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
     

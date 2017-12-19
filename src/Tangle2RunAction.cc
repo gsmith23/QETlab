@@ -85,11 +85,11 @@ void Tangle2RunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("edep14");
   analysisManager->CreateNtupleDColumn("edep15");
   analysisManager->CreateNtupleDColumn("edep16");
-  analysisManager->CreateNtupleDColumn("edep17");
+  analysisManager->CreateNtupleDColumn("edep17"); 
 
   //energy deposited in collimator 
   analysisManager->CreateNtupleDColumn("edepColl1");
-  analysisManager->CreateNtupleDColumn("edepColl2");
+  analysisManager->CreateNtupleDColumn("edepColl2"); // 20
 
   //number of Compton scattering processes in each crystal
   analysisManager->CreateNtupleIColumn("nb_Compt0");
@@ -110,7 +110,7 @@ void Tangle2RunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleIColumn("nb_Compt14");
   analysisManager->CreateNtupleIColumn("nb_Compt15");
   analysisManager->CreateNtupleIColumn("nb_Compt16");
-  analysisManager->CreateNtupleIColumn("nb_Compt17");
+  analysisManager->CreateNtupleIColumn("nb_Compt17"); // 38
 
   //position of first Compton in A
   analysisManager->CreateNtupleDColumn("XposA_1st");
@@ -190,7 +190,14 @@ void Tangle2RunAction::EndOfRunAction(const G4Run* run)
 	   << Tangle2::nMasterEventsPh << " 511 keV deposit events"
 	   << G4endl;
   }
-
+  
+  //   G4cout << G4endl;
+  //   G4cout << " nA1B1 = " << Tangle2::nA1B1 << G4endl;
+  //   G4cout << " nA1B2 = " << Tangle2::nA1B2 << G4endl;
+  //   G4cout << " nA2B1 = " << Tangle2::nA2B1 << G4endl;
+  //   G4cout << " nA2B2 = " << Tangle2::nA2B2 << G4endl;
+  //   G4cout << G4endl;
+  
   G4AnalysisManager* man = G4AnalysisManager::Instance();
   man->Write();
   man->CloseFile();

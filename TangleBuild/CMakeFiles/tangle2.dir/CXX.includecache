@@ -3052,6 +3052,12 @@ G4PrimaryParticle.hh
 G4Types.hh
 /home/lzana/jlab_software/geant4.10.03.p01/source/particles/management/include/G4Types.hh
 
+/home/lzana/jlab_software/geant4.10.03.p01/source/physics_lists/constructors/electromagnetic/include/G4EmLivermorePhysics.hh
+G4VPhysicsConstructor.hh
+/home/lzana/jlab_software/geant4.10.03.p01/source/physics_lists/constructors/electromagnetic/include/G4VPhysicsConstructor.hh
+globals.hh
+/home/lzana/jlab_software/geant4.10.03.p01/source/physics_lists/constructors/electromagnetic/include/globals.hh
+
 /home/lzana/jlab_software/geant4.10.03.p01/source/physics_lists/constructors/electromagnetic/include/G4EmLivermorePolarizedPhysics.hh
 G4VPhysicsConstructor.hh
 /home/lzana/jlab_software/geant4.10.03.p01/source/physics_lists/constructors/electromagnetic/include/G4VPhysicsConstructor.hh
@@ -4007,6 +4013,8 @@ Tangle2DetectorConstruction.hh
 /home/s1321516/MPhysProject/QETlab/Tangle2DetectorConstruction.hh
 G4EmLivermorePolarizedPhysics.hh
 /home/s1321516/MPhysProject/QETlab/G4EmLivermorePolarizedPhysics.hh
+G4EmLivermorePhysics.hh
+/home/s1321516/MPhysProject/QETlab/G4EmLivermorePhysics.hh
 Tangle2ActionInitialization.hh
 /home/s1321516/MPhysProject/QETlab/Tangle2ActionInitialization.hh
 G4UIExecutive.hh

@@ -31,12 +31,9 @@ public:
   virtual void EndOfEventAction();
 
 private:
-  Tangle2RunAction* fpRunAction;
+  //Tangle2RunAction* fpRunAction;
   
-  G4int nComptonA,     nComptonB;
-  G4int fstCompStep_A, sndCompStep_A;
-  G4int fstCompStep_B, sndCompStep_B;
-  
+  G4int nComptonA, nComptonB;
   G4int trackID_A1, trackID_B1;
 
   G4int previousEventID = -1;
@@ -44,6 +41,10 @@ private:
   
   G4bool doubleComptEvent = true;
 
+  // gamma track IDs are different for
+  // back to back and positron sources 
+  G4int sndGammaTrackID = 1; // first track is 2
+  
   // To Do:
   // Investigate dphi calaulated
   // using LOR between hits
@@ -55,34 +56,15 @@ private:
   // G4ThreeVector LOR_A2B2;  
   
   G4ThreeVector beam_A;  
-  
   G4ThreeVector vScat_A1;
-  G4double      cosTheta_A1;
-  G4ThreeVector y_axis_A1; 
-  G4ThreeVector x_axis_A1;
-  
-    
   G4ThreeVector vScat_A2;
-  G4double      cosTheta_A2;  
-  G4ThreeVector y_axis_A2; 
-  G4ThreeVector x_axis_A2;
   
   G4ThreeVector beam_B;
-  
   G4ThreeVector vScat_B1;
-  G4double      cosTheta_B1;
-  G4ThreeVector y_axis_B1; 
-  G4ThreeVector x_axis_B1;
-  
-      
   G4ThreeVector vScat_B2;  
-  G4double      cosTheta_B2;
-  G4ThreeVector y_axis_B2; 
-  G4ThreeVector x_axis_B2;
-  
+
   G4bool comments = false;
-  
-  
+
 };
 
 #endif

@@ -1,15 +1,22 @@
 /control/verbose 2
 
-#/run/numberOfThreads 8
+/run/numberOfThreads 8
 
 /run/initialize
 
 # visualiser
+<<<<<<< HEAD
 /vis/open OGL
 /vis/drawVolume
 
 /control/execute pretty.mac
 /random/setSeeds 4 30
+=======
+#/vis/open OGL
+#/vis/drawVolume
+
+/control/execute pretty.mac
+>>>>>>> 14f13472d63d80072318a17010fa31a1308227cc
 
 #/run/beamOn 5
 

@@ -62,7 +62,8 @@ SET(CMAKE_MAKEFILE_DEPENDS
   "CMakeFiles/2.8.12.2/CMakeSystem.cmake"
   "../gps.mac"
   "../pretty.mac"
-  "../vis.mac"
+  "../visGraph.mac"
+  "../visNoGraph.mac"
   "/usr/share/cmake/Modules/CMakeCInformation.cmake"
   "/usr/share/cmake/Modules/CMakeCXXInformation.cmake"
   "/usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake"
@@ -87,7 +88,8 @@ SET(CMAKE_MAKEFILE_OUTPUTS
 
 # Byproducts of CMake generate step:
 SET(CMAKE_MAKEFILE_PRODUCTS
-  "vis.mac"
+  "visGraph.mac"
+  "visNoGraph.mac"
   "pretty.mac"
   "gps.mac"
   "CMakeFiles/CMakeDirectoryInformation.cmake"
