@@ -67,20 +67,34 @@ void Tangle2DetectorConstruction::DefineMaterials()
   G4Element*  elPb = new G4Element(name="Lead",
 				   symbol="Pb",
 				   z=82., a);     
+  a=89.91*g/mole;
+  G4Element* elY = new G4Element(name="Yttrium",
+				 symbol="Y",
+				 z=39., a);
 
   G4Material* LSO;
   G4Material* lead;
+  G4Material* LYSO;
 
-  // Change to LYSO
   G4double density = 7.4*g/cm3;
   LSO = new G4Material("Lu2SiO5",   
                        density,    
                        3);
+
+  LYSO = new G4Material("Lu2Y2SiO5",
+			density,
+			4);
   //Add Element for Material "Lu2SiO5"
   LSO->AddElement(elSi, 1);
   LSO->AddElement(elLu, 2);
   LSO->AddElement(elO , 5);
-    
+
+  //Add elements for material "Lu2Y2SiO5"
+  LYSO->AddElement(elSi, 1);
+  LYSO->AddElement(elLu, 1.8);
+  LYSO->AddElement(elY, 0.2);
+  LYSO->AddElement(elO, 5);
+
   G4double density_lead = 11.3*g/cm3;
   lead = new G4Material("lead",
 			density_lead,
@@ -99,12 +113,12 @@ G4VPhysicalVolume* Tangle2DetectorConstruction::Construct()
   // Crystal Arrays
   G4double cryst_dX = 22*mm, cryst_dY = 4*mm, cryst_dZ = 4*mm;
 
-  G4Material* cryst_mat   = nist->FindOrBuildMaterial("Lu2SiO5");
+  G4Material* cryst_mat   = nist->FindOrBuildMaterial("Lu2Y2SiO5");
   
   G4bool checkOverlaps = true;
   
   // World
-  G4double world_sizeX  = 108.5*mm; 
+  G4double world_sizeX  = 104.0*mm; 
   G4double world_sizeYZ = 2*cm;
   G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
   
