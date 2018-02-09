@@ -35,15 +35,16 @@ int main(int argc,char** argv)
 {
   
   // Graphics?
-  G4bool  useGraphics = false;
+  G4bool  useGraphics = true;
   
   // Turn on/off polarised Compton
-  G4bool  usePolarisedCompton = true;
+  G4bool  usePolarisedCompton = false;
   
   // Make your beam choices here
-  Tangle2::positrons = false;
-  Tangle2::fixedAxis = true;
-  Tangle2::perpPol   = true;
+  Tangle2::positrons = true;
+  Tangle2::fixedAxis = false;
+  Tangle2::perpPol   = false;
+
   Tangle2::polYZ     = false;
 
   // Do this first to capture all output

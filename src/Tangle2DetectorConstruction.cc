@@ -68,19 +68,39 @@ void Tangle2DetectorConstruction::DefineMaterials()
 				   symbol="Pb",
 				   z=82., a);     
 
+  a=89.91*g/mole;
+  G4Element* elY = new G4Element(name="Yttrium",
+				 symbol="Y",
+				 z=39., a);
+  
+  
   G4Material* LSO;
   G4Material* lead;
-
-  // Change to LYSO
+  G4Material* LYSO;
+  
   G4double density = 7.4*g/cm3;
   LSO = new G4Material("Lu2SiO5",   
                        density,    
                        3);
+  
   //Add Element for Material "Lu2SiO5"
   LSO->AddElement(elSi, 1);
   LSO->AddElement(elLu, 2);
   LSO->AddElement(elO , 5);
-    
+
+  // Saint Gobain - data sheet
+  density = 7.1*g/cm3;
+  LYSO = new G4Material("LYSO",
+			density,
+			4);
+
+
+  //Add elements for material "LYSO"
+  LYSO->AddElement(elLu, 18);
+  LYSO->AddElement(elY, 2);
+  LYSO->AddElement(elSi, 10);
+  LYSO->AddElement(elO, 50);
+  
   G4double density_lead = 11.3*g/cm3;
   lead = new G4Material("lead",
 			density_lead,
@@ -99,12 +119,14 @@ G4VPhysicalVolume* Tangle2DetectorConstruction::Construct()
   // Crystal Arrays
   G4double cryst_dX = 22*mm, cryst_dY = 4*mm, cryst_dZ = 4*mm;
 
-  G4Material* cryst_mat   = nist->FindOrBuildMaterial("Lu2SiO5");
+  //G4Material* cryst_mat   = nist->FindOrBuildMaterial("Lu2SiO5");
+  G4Material* cryst_mat   = nist->FindOrBuildMaterial("LYSO");
   
   G4bool checkOverlaps = true;
   
   // World
-  G4double world_sizeX  = 108.5*mm; 
+  //G4double world_sizeX  = 108.5*mm; 
+  G4double world_sizeX  = 104.0*mm; 
   G4double world_sizeYZ = 2*cm;
   G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
   
