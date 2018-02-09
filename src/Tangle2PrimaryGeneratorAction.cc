@@ -80,10 +80,10 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       G4cout << " Invalid choice: positrons with perp pol  " << G4endl;
   }
   
-  G4bool generatePolYZ = false;
+  G4bool generatePolYandZ = false;
   
   if(Tangle2::polYZ)
-    generatePolYZ = true;
+    generatePolYandZ = true;
   
   // vertex
   G4double x0  = 0*cm, y0  = 0*cm, z0  = 0*cm;
@@ -115,12 +115,16 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     
     G4ThreeVector random = G4RandomDirection();
     
-    random = random.cross(x_axis);
+    // Restrict to YZ plane
+    // ?? Is this still fully random ??
+    G4ThreeVector randomYZ = random.cross(x_axis).unit();
     
-    if(generatePolYZ)
-      fParticleGun->SetParticlePolarization(G4ThreeVector(0,1,0));
+    G4ThreeVector randomY  = G4ThreeVector(0,1,0);
+    
+    if(!generatePolYandZ)
+      fParticleGun->SetParticlePolarization(randomYZ);
     else
-      fParticleGun->SetParticlePolarization(random);
+      fParticleGun->SetParticlePolarization(randomY);
     
     fParticleGun->GeneratePrimaryVertex(anEvent);
     
@@ -128,17 +132,21 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     fParticleGun->SetParticleEnergy(511*keV);
     fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
     fParticleGun->SetParticleMomentumDirection(-x_axis);
-    
+
+    // randomise second photon polarisation wrt first
+    G4ThreeVector randomYZ_2 = G4RandomDirection().cross(x_axis).unit();
+    // 
+    G4ThreeVector randomZ = G4ThreeVector(0,0,1);
+    // perpendicular to first photon
+    G4ThreeVector perpRandomYZ = x_axis.cross(randomYZ).unit();
+
     if(!generatePerpPol)
-      random = G4RandomDirection().cross(x_axis);
+      fParticleGun->SetParticlePolarization(randomYZ_2);
+    else if(generatePolYandZ)
+      fParticleGun->SetParticlePolarization(randomZ);
+    else //
+      fParticleGun->SetParticlePolarization(perpRandomYZ);
     
-    G4ThreeVector PerpPolarization = x_axis.cross(random);
-    
-    if(generatePolYZ)
-      fParticleGun->SetParticlePolarization(G4ThreeVector(0,0,1));
-    else
-      fParticleGun->SetParticlePolarization(PerpPolarization);
-        
     fParticleGun->GeneratePrimaryVertex(anEvent);
   } // end of: if(!generatePositrons){
   else { // if (generatePositrons)

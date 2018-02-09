@@ -44,7 +44,7 @@ int main(int argc,char** argv)
   Tangle2::positrons = false;
   Tangle2::fixedAxis = true;
   Tangle2::perpPol   = true;
-  Tangle2::polYZ     = true;
+  Tangle2::polYZ     = false;
 
   // Do this first to capture all output
   G4UIExecutive* ui = nullptr;

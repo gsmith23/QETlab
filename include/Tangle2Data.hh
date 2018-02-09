@@ -45,6 +45,9 @@ namespace Tangle2 {
   extern G4ThreadLocal G4double thetaB2;
   extern G4ThreadLocal G4double phiA2;
   extern G4ThreadLocal G4double phiB2;
+  
+  extern G4ThreadLocal G4double thetaPolA;
+  extern G4ThreadLocal G4double thetaPolB;
 
   extern G4ThreadLocal G4double dphiA1B2;
   extern G4ThreadLocal G4double dphiA2B1;
