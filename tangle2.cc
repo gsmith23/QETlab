@@ -67,7 +67,7 @@ int main(int argc,char** argv)
 #else
   G4RunManager* runManager = new G4RunManager;
 #endif
-  
+ 
   runManager->SetUserInitialization(new Tangle2DetectorConstruction);
     
   G4int verbose;
