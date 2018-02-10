@@ -44,7 +44,6 @@ int main(int argc,char** argv)
   Tangle2::positrons = true;
   Tangle2::fixedAxis = false;
   Tangle2::perpPol   = false;
-
   Tangle2::polYZ     = false;
 
   // Do this first to capture all output
@@ -68,7 +67,7 @@ int main(int argc,char** argv)
 #else
   G4RunManager* runManager = new G4RunManager;
 #endif
-  
+ 
   runManager->SetUserInitialization(new Tangle2DetectorConstruction);
     
   G4int verbose;
