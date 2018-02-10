@@ -1,2 +1,0 @@
-/scratch2/Chloe/QETlab/TangleBuildScratch/CMakeFiles/tangle2.dir
-/scratch2/Chloe/QETlab/TangleBuildScratch/CMakeFiles/tangle2_exec.dir
