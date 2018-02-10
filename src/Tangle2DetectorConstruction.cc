@@ -72,11 +72,6 @@ void Tangle2DetectorConstruction::DefineMaterials()
 				 symbol="Y",
 				 z=39., a);
 
-  a=89.91*g/mole;
-  G4Element* elY = new G4Element(name="Yttrium",
-				 symbol="Y",
-				 z=39., a);
-  
   
   G4Material* LSO;
   G4Material* lead;
@@ -124,7 +119,7 @@ G4VPhysicalVolume* Tangle2DetectorConstruction::Construct()
 
 
   G4Material* cryst_mat   = nist->FindOrBuildMaterial("Lu2Y2SiO5");
-  G4Material* cryst_mat   = nist->FindOrBuildMaterial("LYSO");
+  //  G4Material* cryst_mat   = nist->FindOrBuildMaterial("LYSO");
     
   G4bool checkOverlaps = true;
   
