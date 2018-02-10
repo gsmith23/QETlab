@@ -90,10 +90,10 @@ void Tangle2DetectorConstruction::DefineMaterials()
   LSO->AddElement(elO , 5);
 
   //Add elements for material "Lu2Y2SiO5"
-  LYSO->AddElement(elSi, 1);
-  LYSO->AddElement(elLu, 1.8);
-  LYSO->AddElement(elY, 0.2);
-  LYSO->AddElement(elO, 5);
+  LYSO->AddElement(elSi, 7*perCent);
+  LYSO->AddElement(elLu, 71*perCent);
+  LYSO->AddElement(elY, 4*perCent);
+  LYSO->AddElement(elO, 18*perCent);
 
   G4double density_lead = 11.3*g/cm3;
   lead = new G4Material("lead",

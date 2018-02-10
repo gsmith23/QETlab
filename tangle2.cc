@@ -38,7 +38,7 @@ int main(int argc,char** argv)
   G4bool  useGraphics = false;
   
   // Turn on/off polarised Compton
-  G4bool  usePolarisedCompton = true;
+  G4bool  usePolarisedCompton = false;
   
   // Make your beam choices here
   Tangle2::positrons = true;

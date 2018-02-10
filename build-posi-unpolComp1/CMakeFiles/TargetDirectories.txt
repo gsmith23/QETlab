@@ -1,0 +1,2 @@
+/scratch2/Chloe/QETlab/build-posi-unpolComp1/CMakeFiles/tangle2.dir
+/scratch2/Chloe/QETlab/build-posi-unpolComp1/CMakeFiles/tangle2_exec.dir
