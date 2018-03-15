@@ -40,6 +40,8 @@ void Tangle2SteppingAction::BeginOfEventAction()
   const G4Event* evt = G4RunManager::GetRunManager()->GetCurrentEvent();
   if(evt) eventID = evt->GetEventID();
 
+  G4cout << " eventID = " << eventID << G4endl;
+
   if(Tangle2::positrons){
     sndGammaTrackID = 2; // first track is 3
   }
@@ -217,6 +219,12 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
        (postPV->GetName() != "Coll_left" ) )
     {
       Tangle2::eDepCryst[postPV->GetCopyNo()] += eDep;
+      
+      G4cout << " processName  = " << processName         << G4endl;
+      G4cout << " particleName = " << particleName        << G4endl;
+      G4cout << " eDep         = " << eDep/keV            << G4endl;
+      G4cout << " PV CopyNo    = " << postPV->GetCopyNo() << G4endl;
+            
     }
   
   //Fill Collimator energy depositions
@@ -273,7 +281,7 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
       
       beam_A   = preMomentumDir;
       vScat_A1 = postMomentumDir;
-  
+      
       
       Tangle2::thetaPolA = thetaPol;
   
