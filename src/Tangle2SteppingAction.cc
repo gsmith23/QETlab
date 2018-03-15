@@ -141,12 +141,12 @@ void Tangle2SteppingAction::EndOfEventAction()
 
 }
 
-void CalculateThetaPhi (const G4ThreeVector& vBeam,
-			const G4ThreeVector& vPre,
-			const G4ThreeVector& vScat,
-			// Output quantities
-			G4double& theta,
-			G4double& phi)
+void CalculateThetaPhi(const G4ThreeVector& vBeam,
+		       const G4ThreeVector& vPre,
+		       const G4ThreeVector& vScat,
+		       // Output quantities
+		       G4double& theta,
+		       G4double& phi)
 {
   
   G4double cosTheta = vScat*vPre;

@@ -81,13 +81,13 @@ void Tangle2DetectorConstruction::DefineMaterials()
   LSO = new G4Material("Lu2SiO5",   
                        density,    
                        3);
-
-   // Saint Gobain - data sheet 
+  
+  // Saint Gobain - data sheet 
   //density = 7.1*g/cm3; 
   LYSO = new G4Material("Lu2Y2SiO5",
 			density,
 			4);
-
+  
   //Add Element for Material "Lu2SiO5"
   LSO->AddElement(elSi, 1);
   LSO->AddElement(elLu, 2);
