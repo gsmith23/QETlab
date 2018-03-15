@@ -8,7 +8,7 @@
 
 /control/execute pretty.mac
 
-/run/beamOn 5
+/run/beamOn 20
 
 # 2 Million
 #/run/beamOn 2000000
