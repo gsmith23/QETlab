@@ -40,7 +40,7 @@ void Tangle2SteppingAction::BeginOfEventAction()
   const G4Event* evt = G4RunManager::GetRunManager()->GetCurrentEvent();
   if(evt) eventID = evt->GetEventID();
 
-  G4cout << " eventID = " << eventID << G4endl;
+  //G4cout << " eventID = " << eventID << G4endl;
 
   if(Tangle2::positrons){
     sndGammaTrackID = 2; // first track is 3
@@ -155,25 +155,46 @@ void CalculateThetaPhi(const G4ThreeVector& vBeam,
   theta = std::acos(cosTheta) * 180/(pi); //convert to degrees
   
   // Redefine x,y,z in the frame of the beam
-  const G4ThreeVector z_axis = vBeam;
   
-  G4ThreeVector arbitraryRef = G4ThreeVector(1,1,1).unit();
+  // fixed axis beam is in lab x direction
+  // so we'll call the beam axis xx_axis
+  const G4ThreeVector xx_axis = vBeam;
+  
+  // we need a global reference to define phi wrt
+  // lets make this 'arbitrary' reference in lab z (ie 'up') so that
+  // when there is a fixed beam, phi = 0 is always in z direction
+  // NB for an isotropic beam the absolute phi will depend on the beam
+  // direction
+  G4ThreeVector scanner_axis = G4ThreeVector(0,0,1);
 
-  // in the unlikey event...
-  if( vBeam.unit() == arbitraryRef )
-    arbitraryRef = G4ThreeVector(0,1,1).unit();
+  // this will be very unlikely 
+  if( vBeam == scanner_axis )
+    scanner_axis = G4ThreeVector(0,1,0);
   
-  // Make new y perpendicular to new z-axis.
-  const G4ThreeVector y_axis = (z_axis.cross(arbitraryRef)).unit();
-  // Make new x perpendicular to z and y.
-  const G4ThreeVector x_axis = y_axis.cross(z_axis);
+  // for a beam in x direction this will be the 
+  // lab y_axis so we'll call it yy_axis
+  const G4ThreeVector yy_axis = (xx_axis.cross(scanner_axis));
+
+  // perpendicular to beam and yy_axis
+  const G4ThreeVector zz_axis = yy_axis.cross(xx_axis);
   
-  const G4ThreeVector vScat_xy = vScat.cross(z_axis);
-  // vScat_xy is vector in xy-plane, perpendicular 
-  // to scattered photon projection
-  const G4double vScat_x = -vScat_xy*y_axis;
-  const G4double vScat_y = vScat_xy*x_axis;
-  phi = std::atan2(vScat_y,vScat_x) * 180/(pi);
+  //-------
+  // Now calculate phi
+
+  // vScat_yz perpendicular to beam and 
+  // scattered photon projections
+  // ( for fixed beam this is in yz plane
+  // which is the system used for the lab )
+  const G4ThreeVector vScat_yz = vScat.cross(xx_axis);
+
+  // the below puts phi = 0 'up'/ on z axis 
+  // for fixed beam in x direction
+  // and matches the assignments of phi
+  // to the crystals in CrystalToPhi() in TSim.C
+  const G4double vScat_z = -vScat_yz*yy_axis;
+  const G4double vScat_y =  vScat_yz*zz_axis;
+
+  phi = std::atan2(vScat_y,vScat_z) * 180/(pi);
 }
 
 void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
@@ -220,10 +241,10 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
     {
       Tangle2::eDepCryst[postPV->GetCopyNo()] += eDep;
       
-      G4cout << " processName  = " << processName         << G4endl;
-      G4cout << " particleName = " << particleName        << G4endl;
-      G4cout << " eDep         = " << eDep/keV            << G4endl;
-      G4cout << " PV CopyNo    = " << postPV->GetCopyNo() << G4endl;
+//       G4cout << " processName  = " << processName         << G4endl;
+//       G4cout << " particleName = " << particleName        << G4endl;
+//       G4cout << " eDep         = " << eDep/keV            << G4endl;
+//       G4cout << " PV CopyNo    = " << postPV->GetCopyNo() << G4endl;
             
     }
   
@@ -281,7 +302,6 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
       
       beam_A   = preMomentumDir;
       vScat_A1 = postMomentumDir;
-      
       
       Tangle2::thetaPolA = thetaPol;
   
