@@ -40,7 +40,7 @@ void Tangle2SteppingAction::BeginOfEventAction()
   const G4Event* evt = G4RunManager::GetRunManager()->GetCurrentEvent();
   if(evt) eventID = evt->GetEventID();
 
-  G4cout << " eventID = " << eventID << G4endl;
+  //G4cout << " eventID = " << eventID << G4endl;
 
   if(Tangle2::positrons){
     sndGammaTrackID = 2; // first track is 3
@@ -143,12 +143,12 @@ void Tangle2SteppingAction::EndOfEventAction()
 
 }
 
-void CalculateThetaPhi (const G4ThreeVector& vBeam,
-			const G4ThreeVector& vPre,
-			const G4ThreeVector& vScat,
-			// Output quantities
-			G4double& theta,
-			G4double& phi)
+void CalculateThetaPhi(const G4ThreeVector& vBeam,
+		       const G4ThreeVector& vPre,
+		       const G4ThreeVector& vScat,
+		       // Output quantities
+		       G4double& theta,
+		       G4double& phi)
 {
   
   G4double cosTheta = vScat*vPre;
@@ -220,10 +220,10 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
     {
       Tangle2::eDepCryst[postPV->GetCopyNo()] += eDep;
       
-      G4cout << " processName  = " << processName         << G4endl;
-      G4cout << " particleName = " << particleName        << G4endl;
-      G4cout << " eDep         = " << eDep/keV            << G4endl;
-      G4cout << " PV CopyNo    = " << postPV->GetCopyNo() << G4endl;
+      // G4cout << " processName  = " << processName         << G4endl;
+      // G4cout << " particleName = " << particleName        << G4endl;
+      // G4cout << " eDep         = " << eDep/keV            << G4endl;
+      // G4cout << " PV CopyNo    = " << postPV->GetCopyNo() << G4endl;
             
     }
   
