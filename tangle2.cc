@@ -37,15 +37,21 @@ int main(int argc,char** argv)
   // Graphics?
   G4bool  useGraphics = false;
   
-  // Turn on/off polarised Compton
-  G4bool  usePolarisedCompton = false;
-  
   // Make your beam choices here
+  
+  // A - axis
+  Tangle2::fixedAxis = false;
+  
+  // B - beam particle
   Tangle2::positrons = false;
-  Tangle2::fixedAxis = true;
-  Tangle2::perpPol   = true;
+  
+  // polarisation direction
+  Tangle2::perpPol   = false;
   Tangle2::polYZ     = false;
 
+  // C - polarised/unpolarised Compton scattering
+  G4bool  usePolarisedCompton = false;
+  
   // Do this first to capture all output
   G4UIExecutive* ui = nullptr;
   

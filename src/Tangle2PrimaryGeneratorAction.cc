@@ -29,6 +29,7 @@
 #include "G4SystemOfUnits.hh"
 #include "Randomize.hh"
 #include "G4RandomDirection.hh"
+#include "G4PhysicalConstants.hh"
 
 #include "G4GeneralParticleSource.hh"
 
@@ -91,60 +92,88 @@ void Tangle2PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   //-----------------------Back to back photons------------------------ 
   if(!generatePositrons){
     
-    G4double a = 10;
-    //Generate two random numbers between 1 and -1
-    G4double b = (2*(( (G4double) rand() / (RAND_MAX)) - 0.5));
-    G4double c = (2*(( (G4double) rand() / (RAND_MAX)) - 0.5));
-    
+    G4ThreeVector beam_axis;
     if (generateFixedAxis){
-      a = 1;
-      b = 0;
-      c = 0;
+      beam_axis.set(1,0,0);
+    }
+    else{ // isotropic over theta = [0,12] degrees
+      
+      G4double theta    = 999999.9;
+      G4double cosTheta = 99999.9;
+      G4double sinTheta = 9999.9;
+      G4double phi      = 999.9;
+	
+      // 12 degrees is just outside of 
+      // outer crystal outer edge
+      // atan(6/30)
+      while(theta > 12. ){
+	// code from G4RandomDirection
+	cosTheta  = 2.*G4UniformRand()-1.;
+	G4double sinTheta2 = 1. - cosTheta*cosTheta;
+	if( sinTheta2 < 0.)  sinTheta2 = 0.;
+	sinTheta  = std::sqrt(sinTheta2); 
+	phi       = twopi*G4UniformRand();
+	theta = std::acos(cosTheta)* 180/(pi);
+      }
+      
+      //      G4cout << " theta = " << theta << G4endl;
+      
+      // theta wrt x-axis (fixed beam in x)
+      beam_axis.set(cosTheta,
+		    sinTheta*std::cos(phi),
+		    sinTheta*std::sin(phi));
+      
+      beam_axis = beam_axis.unit(); 
+      
+//       G4cout << " beam_axis = (" << beam_axis.getX() 
+// 	     <<              "," << beam_axis.getY() 
+// 	     <<              "," << beam_axis.getZ()
+// 	     <<              ")" << G4endl;
+      
+    
     }
     
-    // random direction +/- 8deg about x-axis
-    // or x-axis (generateFixedAxis)
-    G4ThreeVector x_axis = G4ThreeVector(a, b, c); 
-    
+    //----------------------------------
     // Photon 1
     fParticleGun->SetParticleDefinition(particleTable->FindParticle(particleName="gamma"));
     fParticleGun->SetParticleEnergy(511*keV);
     
     fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
-    fParticleGun->SetParticleMomentumDirection(x_axis);
+    fParticleGun->SetParticleMomentumDirection(beam_axis);
     
     G4ThreeVector random = G4RandomDirection();
     
     // Restrict to YZ plane
-    // ?? Is this still fully random ??
-    G4ThreeVector randomYZ = random.cross(x_axis).unit();
+    // To do: check 'randomness' of projection
+    G4ThreeVector randomYZ = random.cross(beam_axis).unit();
     
-    G4ThreeVector randomY  = G4ThreeVector(0,1,0);
+    G4ThreeVector y_axis   = G4ThreeVector(0,1,0);
     
     if(!generatePolYandZ)
       fParticleGun->SetParticlePolarization(randomYZ);
     else
-      fParticleGun->SetParticlePolarization(randomY);
+      fParticleGun->SetParticlePolarization(y_axis);
     
     fParticleGun->GeneratePrimaryVertex(anEvent);
     
+    //----------------------------------
     // Photon 2
     fParticleGun->SetParticleEnergy(511*keV);
     fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
-    fParticleGun->SetParticleMomentumDirection(-x_axis);
+    fParticleGun->SetParticleMomentumDirection(-beam_axis);
 
     // randomise second photon polarisation wrt first
-    G4ThreeVector randomYZ_2 = G4RandomDirection().cross(x_axis).unit();
+    G4ThreeVector randomYZ_2 = G4RandomDirection().cross(beam_axis).unit();
     // 
-    G4ThreeVector randomZ = G4ThreeVector(0,0,1);
+    G4ThreeVector z_axis = G4ThreeVector(0,0,1);
     // perpendicular to first photon
-    G4ThreeVector perpRandomYZ = x_axis.cross(randomYZ).unit();
-
+    G4ThreeVector perpRandomYZ = beam_axis.cross(randomYZ).unit();
+    
     if(!generatePerpPol)
       fParticleGun->SetParticlePolarization(randomYZ_2);
     else if(generatePolYandZ)
-      fParticleGun->SetParticlePolarization(randomZ);
-    else //
+      fParticleGun->SetParticlePolarization(z_axis);
+    else 
       fParticleGun->SetParticlePolarization(perpRandomYZ);
     
     fParticleGun->GeneratePrimaryVertex(anEvent);

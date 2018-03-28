@@ -10,9 +10,3 @@
 
 /run/beamOn 20
 
-# 2 Million
-#/run/beamOn 2000000
-
-# 2 Billion
-#/run/beamOn 2000000000
-
