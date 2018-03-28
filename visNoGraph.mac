@@ -4,7 +4,7 @@
 
 /run/initialize
 
-/run/beamOn 10
+#/run/beamOn 5
 
 # 200 Thousand
 #/run/beamOn 200000
@@ -16,5 +16,5 @@
 #/run/beamOn 1000000000
 
 # 2 Billion
-#/run/beamOn 2000000000
+/run/beamOn 2000000000
 
