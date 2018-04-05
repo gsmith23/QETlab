@@ -34,17 +34,31 @@
 int main(int argc,char** argv)
 {
   
-  // Graphics?
+  //------------------------
+  // Graphics
   G4bool  useGraphics = false;
   
-  // Make your beam choices here
-  Tangle2::fixedAxis = true;
+  //--------------------------
+  // Beam
+
+  // A - axis
+  Tangle2::fixedAxis = false;
+  
+  // B - beam particle
   Tangle2::positrons = false;
-  Tangle2::perpPol   = true;
+  
+  // polarisation direction
+  Tangle2::perpPol   = false;
   Tangle2::polYZ     = false;
 
-  // Turn on/off polarised Compton
-  G4bool  usePolarisedCompton = false;
+  // C - polarised/unpolarised Compton scattering
+  G4bool  usePolarisedCompton = true;
+
+  //--------------------------
+  // Detector 
+  // True: arrays 90 cm apart (45 cm from source)  
+  // False: arrays 6 cm apart (3 cm from source)  
+  Tangle2::fullPET   = true;
 
   // Do this first to capture all output
   G4UIExecutive* ui = nullptr;
@@ -97,6 +111,15 @@ int main(int argc,char** argv)
   
   G4cout << " ------------------------------------------ " << G4endl;
   G4cout << " QETlab simulation " << G4endl;
+  G4cout <<  G4endl;
+
+  if(Tangle2::fullPET){
+    G4cout << " Human PET diameter " << G4endl;
+  }
+  else{
+    G4cout << " Lab experiment diameter " << G4endl;
+  }
+    
   G4cout <<  G4endl;
   G4cout << " Generated : " << G4endl;
   

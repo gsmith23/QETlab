@@ -4,6 +4,7 @@ G4bool Tangle2::positrons = false;
 G4bool Tangle2::fixedAxis = false;
 G4bool Tangle2::perpPol   = false;
 G4bool Tangle2::polYZ     = false;
+G4bool Tangle2::fullPET   = false;
 
 // For runs with multi-threading
 G4int Tangle2::nMasterEventsPh = 0;
@@ -17,10 +18,17 @@ G4ThreadLocal G4double Tangle2::eDepCryst[18] ={0.};
 G4ThreadLocal G4double Tangle2::eDepColl1 =0.;
 G4ThreadLocal G4double Tangle2::eDepColl2 =0.;
 G4ThreadLocal G4int Tangle2::nb_Compt[18] ={0};
+G4ThreadLocal G4int Tangle2::nb_Photo[18] ={0};
+
 G4ThreadLocal G4ThreeVector Tangle2::posA_1 = G4ThreeVector();
 G4ThreadLocal G4ThreeVector Tangle2::posB_1 = G4ThreeVector();
 G4ThreadLocal G4ThreeVector Tangle2::posA_2 = G4ThreeVector();
 G4ThreadLocal G4ThreeVector Tangle2::posB_2 = G4ThreeVector();
+// photoelectric effect positions
+G4ThreadLocal G4ThreeVector Tangle2::posA_P1 = G4ThreeVector();
+G4ThreadLocal G4ThreeVector Tangle2::posB_P1 = G4ThreeVector();
+G4ThreadLocal G4ThreeVector Tangle2::posA_P2 = G4ThreeVector();
+G4ThreadLocal G4ThreeVector Tangle2::posB_P2 = G4ThreeVector();
 G4ThreadLocal G4double Tangle2::thetaA = 0;
 G4ThreadLocal G4double Tangle2::thetaB = 0;
 G4ThreadLocal G4double Tangle2::phiA = 0;

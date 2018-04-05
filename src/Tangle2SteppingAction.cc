@@ -54,11 +54,15 @@ void Tangle2SteppingAction::BeginOfEventAction()
       G4cout << " Event " << eventID << G4endl;
     }
     
-    for (int i = 0 ; i < 18 ; i++)
+    for (int i = 0 ; i < 18 ; i++){
       Tangle2::nb_Compt[i]=0; 
+      Tangle2::nb_Photo[i]=0; 
+    }
     
-    nComptonA     = 0;
-    nComptonB     = 0;
+    nComptonA = 0;
+    nComptonB = 0;
+    nPhotoA   = 0;
+    nPhotoB   = 0;
     
     trackID_A1 = -1;
     trackID_B1 = -1;
@@ -68,7 +72,7 @@ void Tangle2SteppingAction::BeginOfEventAction()
     doubleComptEvent = true;
     
   }
- 
+  
 }
 
 
@@ -151,50 +155,122 @@ void CalculateThetaPhi(const G4ThreeVector& vBeam,
 		       G4double& phi)
 {
   
+  // for testing phi convention
+  //G4ThreeVector tempVScat(0,1,1);
+  
   G4double cosTheta = vScat*vPre;
   theta = std::acos(cosTheta) * 180/(pi); //convert to degrees
   
-  // Redefine x,y,z in the frame of the beam
+  G4bool comments = false;
+  
+  if(comments){
+    G4cout << G4endl;
+    G4cout << " ----------- "  << G4endl;
+    G4cout << " theta = " << theta << G4endl;
+  }
+  
+  // Define x,y,z in the frame of the beam
   
   // fixed axis beam is in lab x direction
   // so we'll call the beam axis xx_axis
   const G4ThreeVector xx_axis = vBeam;
   
+  if(comments){
+    G4cout << G4endl;
+    G4cout << " vBeam = ("  << vBeam.getX() 
+	   <<           "," << vBeam.getY() 
+	   <<           "," << vBeam.getZ()
+	   <<          " )" << G4endl;
+    
+    G4cout << G4endl;
+    G4cout << " vPre  = ("  << vPre.getX() 
+	   <<           "," << vPre.getY() 
+	   <<           "," << vPre.getZ()
+	   <<          " )" << G4endl;
+    
+    G4cout << G4endl;
+    G4cout << " vScat = ("  << vScat.getX() 
+	   <<           "," << vScat.getY() 
+	   <<           "," << vScat.getZ()
+	   <<          " )" << G4endl;
+  }
+    
   // we need a global reference to define phi wrt
-  // lets make this 'arbitrary' reference in lab z (ie 'up') so that
+  // lets make this 'arbitrary' reference in lab z (ie lab 'up') so that
   // when there is a fixed beam, phi = 0 is always in z direction
-  // NB for an isotropic beam the absolute phi will depend on the beam
-  // direction
+  // NB for an isotropic beam as the phi plane depends on the beam
+  // direction the plane may not be consistent with the detector
+  // surface
+
   G4ThreeVector scanner_axis = G4ThreeVector(0,0,1);
 
-  // this will be very unlikely 
+  // safety - very unlikely 
   if( vBeam == scanner_axis )
     scanner_axis = G4ThreeVector(0,1,0);
   
   // for a beam in x direction this will be the 
   // lab y_axis so we'll call it yy_axis
-  const G4ThreeVector yy_axis = (xx_axis.cross(scanner_axis));
+  const G4ThreeVector yy_axis = (scanner_axis.cross(xx_axis));
 
+  if(comments){
+    G4cout << G4endl;
+    G4cout << " yy_axis = ("  << yy_axis.getX() 
+	   <<             "," << yy_axis.getY() 
+	   <<             "," << yy_axis.getZ()
+	   <<            " )" << G4endl;
+  }
+  
   // perpendicular to beam and yy_axis
-  const G4ThreeVector zz_axis = yy_axis.cross(xx_axis);
+  const G4ThreeVector zz_axis = xx_axis.cross(yy_axis);
+  
+  if(comments){
+    G4cout << G4endl;
+    G4cout << " zz_axis = ("  << zz_axis.getX() 
+	   <<             "," << zz_axis.getY() 
+	   <<             "," << zz_axis.getZ()
+	   <<            " )" << G4endl;
+  }
   
   //-------
-  // Now calculate phi
-
+  // Calculate phi
+  // with phi =   0,      90,       180,     -90 
+  //    at     (0,0,1), (0,1,0), (0,0,-1), (0,-1,0)
+  // for (1,0,0) beam
+  
   // vScat_yz perpendicular to beam and 
   // scattered photon projections
-  // ( for fixed beam this is in yz plane
-  // which is the system used for the lab )
-  const G4ThreeVector vScat_yz = vScat.cross(xx_axis);
-
-  // the below puts phi = 0 'up'/ on z axis 
-  // for fixed beam in x direction
-  // and matches the assignments of phi
-  // to the crystals in CrystalToPhi() in TSim.C
+  // for fixed beam this is in yz plane
+  //  which is the system used for the lab:
+  // (1,0,0)x(Sx,Sy,Sz) = (0,-Sz,Sy)
+  
+  const G4ThreeVector vScat_yz = xx_axis.cross(vScat);
+  
+  if(comments){
+    G4cout << G4endl;
+    G4cout << " vScat_yz = ("  << vScat_yz.getX() 
+	   <<              "," << vScat_yz.getY() 
+	   <<              "," << vScat_yz.getZ()
+	   <<             " )" << G4endl;
+  }
+  
+  // for fixed beam z component is (negative) 
+  // y component of vScat_yz - [see above]
   const G4double vScat_z = -vScat_yz*yy_axis;
   const G4double vScat_y =  vScat_yz*zz_axis;
-
+    
   phi = std::atan2(vScat_y,vScat_z) * 180/(pi);
+  
+  if(comments){
+    G4cout << G4endl;
+    G4cout << " vScat_y  = " << vScat_y << G4endl;
+    G4cout << G4endl;
+    G4cout << " vScat_z  = " << vScat_z << G4endl;
+    
+    G4cout << G4endl;
+    G4cout << " phi = "  << phi << G4endl;
+    G4cout << " ----------- "  << G4endl;
+  }
+  
 }
 
 void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
@@ -255,7 +331,7 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
   */
   
   // If there was no Compton scattering for the 
-  // first track then delta phi cant be calculated
+  // second track (first out) then delta phi cant be calculated
   if(!doubleComptEvent)
     return;
   
@@ -272,16 +348,74 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
     return;
   }
     
-//   G4cout << G4endl;
-//   G4cout << " particleName = " << particleName << G4endl;
-//   G4cout << " processName  = " << processName  << G4endl;
+  // G4cout << G4endl;
+  // G4cout << " particleName = " << particleName << G4endl;
+  // G4cout << " processName  = " << processName  << G4endl;
+  
+  //---------------------------
+  // only photons shall pass
+  if(particleName != "gamma")
+    return;
+  
+  //------------------------
+  // record photoelectric
+
+  if( processName  == "phot"){
+    
+    Tangle2::nb_Photo[postPV->GetCopyNo()]++;
+    
+    // array A 
+    if     ( postPos[0] > 0) {
+      
+      
+      // first Photoelectric in A after initial
+      // Compton in B by same track
+      if     (nPhotoA == 0 &&
+	      trackID == trackID_A1){ 
+	//G4cout << " array A   " << G4endl;
+	nPhotoA  = 1;
+	Tangle2::posA_P1 = postPos; 
+      }
+      // second Photoelectric in A ..
+      // expect this to be at least rare
+      if     (nPhotoA == 1 &&
+	      trackID == trackID_A1){ 
+	nPhotoA  = 2;
+	Tangle2::posA_P2 = postPos; 
+      }
+      
+      
+    }// array B
+    else if( postPos[0] < 0){
+      
+      
+      // first Photoelectric in B after initial
+      // Compton in B by same track
+      if     (nPhotoB == 0 &&
+	      trackID == trackID_B1){ 
+	//G4cout << " array B   " << G4endl;
+	nPhotoB  = 1;
+	Tangle2::posB_P1 = postPos; 
+      }
+      // second Photo in B ..
+      // expect this to be at least rare
+      if     (nPhotoB == 1 &&
+	      trackID == trackID_B1){ 
+	nPhotoB  = 2;
+	Tangle2::posA_P2 = postPos; 
+      }
+      
+    }
+    
+  }
+
+  //-------------------------
   
   //-------------------------
   // From here on only gammas 
   // Compton scattering may pass. 
   
-  if( (particleName != "gamma") || 
-      (processName  != "compt") ) 
+  if( processName  != "compt")  
     return;
   
   //G4double cosThetaPol = preStepPol.unit().dot(postStepPol.unit());
@@ -319,7 +453,6 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
 			vScat_A1,
 			Tangle2::thetaA,
 			Tangle2::phiA);
-  
 
       // G4cout << G4endl;
       // G4cout << " beam_A.phi()    = " << beam_A.phi()*180/pi   << G4endl;

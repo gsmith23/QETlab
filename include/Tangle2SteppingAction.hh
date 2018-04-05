@@ -32,8 +32,9 @@ public:
 
 private:
   //Tangle2RunAction* fpRunAction;
-  
+
   G4int nComptonA, nComptonB;
+  G4int nPhotoA,   nPhotoB;
   G4int trackID_A1, trackID_B1;
 
   G4int previousEventID = -1;
@@ -43,6 +44,7 @@ private:
 
   // gamma track IDs are different for
   // back to back and positron sources 
+  // initialise for back to back case
   G4int sndGammaTrackID = 1; // first track is 2
   
   // To Do:

@@ -83,7 +83,7 @@ void Tangle2DetectorConstruction::DefineMaterials()
                        3);
   
   // Saint Gobain - data sheet 
-  //density = 7.1*g/cm3; 
+  // density = 7.1*g/cm3; 
   LYSO = new G4Material("Lu2Y2SiO5",
 			density,
 			4);
@@ -113,22 +113,26 @@ void Tangle2DetectorConstruction::DefineMaterials()
 G4VPhysicalVolume* Tangle2DetectorConstruction::Construct()
 {  
   G4NistManager* nist = G4NistManager::Instance();
-  
-  // Crystal Arrays
-  G4double cryst_dX = 22*mm, cryst_dY = 4*mm, cryst_dZ = 4*mm;
-
-
-  G4Material* cryst_mat   = nist->FindOrBuildMaterial("Lu2Y2SiO5");
-  //  G4Material* cryst_mat   = nist->FindOrBuildMaterial("LYSO");
-    
   G4bool checkOverlaps = true;
   
-  // World
-  //G4double world_sizeX  = 108.5*mm; 
-  G4double world_sizeX  = 104.0*mm; 
-  G4double world_sizeYZ = 2*cm;
-  G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
+  // Crystal full dimensions
+  G4double cryst_dX = 22*mm, cryst_dY = 4*mm, cryst_dZ = 4*mm;
+
+  G4Material* cryst_mat   = nist->FindOrBuildMaterial("Lu2Y2SiO5");
   
+  G4double ringDiameter = 60.*mm;
+  
+  // set in tangle2.cc
+  if(Tangle2::fullPET)
+    ringDiameter = 900*mm;
+  
+  // World
+  
+  // leave a 1 mm gap after crystals
+  G4double    world_sizeX  = (ringDiameter + 2*cryst_dX + 2.)*mm; 
+  G4double    world_sizeYZ = 2*cm;
+  G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
+    
   G4Box* solidWorld =    
     new G4Box("World",
 	      0.5*world_sizeX,
@@ -150,22 +154,22 @@ G4VPhysicalVolume* Tangle2DetectorConstruction::Construct()
                       0,                     
                       checkOverlaps);        
   
-  // Crystal
-  G4double pos_dX = 0.5*(world_sizeX-cryst_dX);
   
   G4Box* solidCryst =    
     new G4Box("crystal",                    
 	      0.5*cryst_dX, 0.5*cryst_dY, 0.5*cryst_dZ); 
-      
+  
   G4LogicalVolume* logicCryst =                         
     new G4LogicalVolume(solidCryst,            
                         cryst_mat,
                         "CrystalLV");         
-               
   
   //array of positions for 18 crystals
   G4int nb_cryst = 18;
   
+  // Crystal centres
+  G4double pos_dX = 0.5*(world_sizeX - cryst_dX - 2.);
+
   G4ThreeVector positions[18] = {
     G4ThreeVector(pos_dX,-cryst_dY,cryst_dZ),
     G4ThreeVector(pos_dX,0,cryst_dZ),
@@ -185,7 +189,7 @@ G4VPhysicalVolume* Tangle2DetectorConstruction::Construct()
     G4ThreeVector(-pos_dX,-cryst_dY,-cryst_dZ),
     G4ThreeVector(-pos_dX,0,-cryst_dZ),
     G4ThreeVector(-pos_dX,cryst_dY,-cryst_dZ)};
-
+  
   for (G4int icrys = 0; icrys < nb_cryst; icrys++) {
     new G4PVPlacement(0,                      
 		      positions[icrys],       

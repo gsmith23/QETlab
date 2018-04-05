@@ -49,12 +49,22 @@ void Tangle2EventAction::BeginOfEventAction(const G4Event*)
     Tangle2::eDepCryst[i] = 0.;
   Tangle2::eDepColl1 = 0;
   Tangle2::eDepColl2 = 0;
-  for (G4int i = 0; i<18; i++)
+
+  for (G4int i = 0; i<18; i++){
     Tangle2::nb_Compt[i] = 0.;
+    Tangle2::nb_Photo[i] = 0.;
+  }
+
   Tangle2::posA_1 = G4ThreeVector(-99.,-99.,-99.);
   Tangle2::posA_2 = G4ThreeVector(-99.,-99.,-99.);
   Tangle2::posB_1 = G4ThreeVector(-99.,-99.,-99.);
   Tangle2::posB_2 = G4ThreeVector(-99.,-99.,-99.);
+  
+  Tangle2::posA_P1 = G4ThreeVector(-99.,-99.,-99.);
+  Tangle2::posA_P2 = G4ThreeVector(-99.,-99.,-99.);
+  Tangle2::posB_P1 = G4ThreeVector(-99.,-99.,-99.);
+  Tangle2::posB_P2 = G4ThreeVector(-99.,-99.,-99.);
+  
   Tangle2::thetaA = 0;
   Tangle2::thetaB = 0;
   Tangle2::phiA = 0;
@@ -113,7 +123,7 @@ void Tangle2EventAction::EndOfEventAction(const G4Event*)
     
     for (G4int i = 0 ; i < 18 ; i++)
       man->FillNtupleIColumn(i+20, Tangle2::nb_Compt[i]);
-    
+        
     man->FillNtupleDColumn(38, Tangle2::posA_1[0]/mm);
     man->FillNtupleDColumn(39, Tangle2::posA_1[1]/mm);
     man->FillNtupleDColumn(40, Tangle2::posA_1[2]/mm);
@@ -152,7 +162,27 @@ void Tangle2EventAction::EndOfEventAction(const G4Event*)
     man->FillNtupleDColumn(63, Tangle2::thetaPolB);
     
     man->FillNtupleDColumn(64, Tangle2::nEvents);
+
+    for (G4int i = 0 ; i < 18 ; i++)
+      man->FillNtupleIColumn(i+65, Tangle2::nb_Photo[i]);
+
+    man->FillNtupleDColumn(83, Tangle2::posA_P1[0]/mm);
+    man->FillNtupleDColumn(84, Tangle2::posA_P1[1]/mm);
+    man->FillNtupleDColumn(85, Tangle2::posA_P1[2]/mm);
     
+    man->FillNtupleDColumn(86, Tangle2::posA_P2[0]/mm);
+    man->FillNtupleDColumn(87, Tangle2::posA_P2[1]/mm);
+    man->FillNtupleDColumn(88, Tangle2::posA_P2[2]/mm);
+    
+    man->FillNtupleDColumn(89, Tangle2::posB_P1[0]/mm);
+    man->FillNtupleDColumn(90, Tangle2::posB_P1[1]/mm);
+    man->FillNtupleDColumn(91, Tangle2::posB_P1[2]/mm);
+    
+    man->FillNtupleDColumn(92, Tangle2::posB_P2[0]/mm);
+    man->FillNtupleDColumn(93, Tangle2::posB_P2[1]/mm);
+    man->FillNtupleDColumn(94, Tangle2::posB_P2[2]/mm);
+    
+
     man->AddNtupleRow();
   }
   

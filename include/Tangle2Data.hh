@@ -20,6 +20,7 @@ namespace Tangle2 {
   extern G4bool fixedAxis;
   extern G4bool perpPol;
   extern G4bool polYZ;
+  extern G4bool fullPET;
   
   extern G4int nMasterEvents;
   extern G4int nMasterEventsPh;  
@@ -32,10 +33,19 @@ namespace Tangle2 {
   extern G4ThreadLocal G4double eDepColl1;
   extern G4ThreadLocal G4double eDepColl2;
   extern G4ThreadLocal G4int nb_Compt[18];
+
   extern G4ThreadLocal G4ThreeVector posA_1;
   extern G4ThreadLocal G4ThreeVector posB_1;
   extern G4ThreadLocal G4ThreeVector posA_2;
   extern G4ThreadLocal G4ThreeVector posB_2;
+
+  // photoelectric effect positions
+  extern G4ThreadLocal G4int nb_Photo[18];
+  extern G4ThreadLocal G4ThreeVector posA_P1;
+  extern G4ThreadLocal G4ThreeVector posB_P1;
+  extern G4ThreadLocal G4ThreeVector posA_P2;
+  extern G4ThreadLocal G4ThreeVector posB_P2;
+
   extern G4ThreadLocal G4double thetaA;
   extern G4ThreadLocal G4double thetaB;
   extern G4ThreadLocal G4double phiA;

@@ -151,6 +151,45 @@ void Tangle2RunAction::BeginOfRunAction(const G4Run*)
 
   analysisManager->CreateNtupleDColumn("nEvents");
 
+  //number of photoelectric processes in each crystal
+  analysisManager->CreateNtupleIColumn("nb_Photo0");
+  analysisManager->CreateNtupleIColumn("nb_Photo1");
+  analysisManager->CreateNtupleIColumn("nb_Photo2");
+  analysisManager->CreateNtupleIColumn("nb_Photo3");
+  analysisManager->CreateNtupleIColumn("nb_Photo4");
+  analysisManager->CreateNtupleIColumn("nb_Photo5");
+  analysisManager->CreateNtupleIColumn("nb_Photo6");
+  analysisManager->CreateNtupleIColumn("nb_Photo7");
+  analysisManager->CreateNtupleIColumn("nb_Photo8");
+    
+  analysisManager->CreateNtupleIColumn("nb_Photo9");
+  analysisManager->CreateNtupleIColumn("nb_Photo10");
+  analysisManager->CreateNtupleIColumn("nb_Photo11");
+  analysisManager->CreateNtupleIColumn("nb_Photo12");
+  analysisManager->CreateNtupleIColumn("nb_Photo13");
+  analysisManager->CreateNtupleIColumn("nb_Photo14");
+  analysisManager->CreateNtupleIColumn("nb_Photo15");
+  analysisManager->CreateNtupleIColumn("nb_Photo16");
+  analysisManager->CreateNtupleIColumn("nb_Photo17"); // 
+  
+  
+  //position of first Photoelectric in A
+  analysisManager->CreateNtupleDColumn("XposA_P1st");
+  analysisManager->CreateNtupleDColumn("YposA_P1st");
+  analysisManager->CreateNtupleDColumn("ZposA_P1st");
+  //position of second Photoelectric in A
+  analysisManager->CreateNtupleDColumn("XposA_P2nd");
+  analysisManager->CreateNtupleDColumn("YposA_P2nd");
+  analysisManager->CreateNtupleDColumn("ZposA_P2nd");
+  //position of first Photoelectric in B
+  analysisManager->CreateNtupleDColumn("XposB_P1st");
+  analysisManager->CreateNtupleDColumn("YposB_P1st");
+  analysisManager->CreateNtupleDColumn("ZposB_P1st");
+  //position of second Photoelectric in B
+  analysisManager->CreateNtupleDColumn("XposB_P2nd");
+  analysisManager->CreateNtupleDColumn("YposB_P2nd");
+  analysisManager->CreateNtupleDColumn("ZposB_P2nd");
+
  
   analysisManager->FinishNtuple();
   
@@ -176,7 +215,7 @@ void Tangle2RunAction::EndOfRunAction(const G4Run* run)
       << G4Threading::G4GetThreadId() << G4endl;
     
     G4cout << Tangle2::nEvents << " events, "
-	   << ", " << Tangle2::nEventsPh << " 511 keV deposit events"
+	   << ", " << Tangle2::nEventsPh << " QET events"
 	   << G4endl;
     
     // Always use a lock when writing to a 
@@ -193,7 +232,7 @@ void Tangle2RunAction::EndOfRunAction(const G4Run* run)
       << G4endl;
     
     G4cout << Tangle2::nMasterEvents   << " events, "
-	   << Tangle2::nMasterEventsPh << " 511 keV deposit events"
+	   << Tangle2::nMasterEventsPh << " QET events"
 	   << G4endl;
   }
   
