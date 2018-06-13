@@ -36,7 +36,7 @@ int main(int argc,char** argv)
   
   //------------------------
   // Graphics
-  G4bool  useGraphics = false;
+  G4bool  useGraphics = true;
   
   //--------------------------
   // Beam
@@ -45,11 +45,15 @@ int main(int argc,char** argv)
   Tangle2::fixedAxis = false;
   
   // B - beam particle
-  Tangle2::positrons = false;
+  Tangle2::positrons = true;
   
   // polarisation direction
   Tangle2::perpPol   = false;
   Tangle2::polYZ     = false;
+
+  // safety
+  if(Tangle2::polYZ)
+    Tangle2::perpPol   = true;
 
   // C - polarised/unpolarised Compton scattering
   G4bool  usePolarisedCompton = true;
@@ -58,7 +62,7 @@ int main(int argc,char** argv)
   // Detector 
   // True: arrays 90 cm apart (45 cm from source)  
   // False: arrays 6 cm apart (3 cm from source)  
-  Tangle2::fullPET   = true;
+  Tangle2::fullPET   = false;
 
   // Do this first to capture all output
   G4UIExecutive* ui = nullptr;

@@ -369,7 +369,7 @@ void Tangle2SteppingAction::UserSteppingAction(const G4Step* step)
       
       
       // first Photoelectric in A after initial
-      // Compton in B by same track
+      // Compton in A by same track
       if     (nPhotoA == 0 &&
 	      trackID == trackID_A1){ 
 	//G4cout << " array A   " << G4endl;

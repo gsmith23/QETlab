@@ -4,7 +4,9 @@
 
 /run/initialize
 
-/run/beamOn 50
+#/process/eplusAnnihilationEntanglement true
+
+#/run/beamOn 50
 
 # 200 Thousand
 #/run/beamOn 200000
