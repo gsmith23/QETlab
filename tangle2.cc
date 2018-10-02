@@ -36,7 +36,7 @@ int main(int argc,char** argv)
   
   //------------------------
   // Graphics
-  G4bool  useGraphics = true;
+  G4bool  useGraphics = false;
   
   //--------------------------
   // Beam
