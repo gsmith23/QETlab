@@ -1,4 +1,3 @@
-QETlab example simulates a simple geometry.
+QETlab - Geant4 simulation for two 3x3 LYSO array geometry.  
 
-Please note that the conditions used to output events are applicable
-only to this particular example (two photons with set momenta).
+This code requires the (non-public) entanglement code extension provided by John Allison.
